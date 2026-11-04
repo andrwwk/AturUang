@@ -34,6 +34,7 @@
   --note-a: #0e7a5a;   /* banknote card gradient */
   --note-b: #053a2b;
   --gold: #e9c46a;
+  --gold-ink: #8a6410;
   --ok: #1f7a3d; --warn: #a35c00; --bad: #c0261a;
   --warn-soft: #fbeed7; --bad-soft: #fde3df;
   --bar-bg: rgba(255,255,255,.82);
@@ -50,7 +51,7 @@
   :root {
     --bg: #07100c; --surface: #111c17; --sunk: #182621; --ink: #e6f0eb; --muted: #94a89f; --line: #22322b;
     --accent: #46cf9f; --accent-ink: #04261b; --accent-soft: #143a2d;
-    --note-a: #128a64; --note-b: #04291e; --gold: #f0cf7a;
+    --note-a: #128a64; --note-b: #04291e; --gold: #f0cf7a; --gold-ink: #f0cf7a;
     --ok: #5fd68a; --warn: #f2b54f; --bad: #ff7b6e; --warn-soft: #362a12; --bad-soft: #3b1916;
     --bar-bg: rgba(17,28,23,.82);
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
@@ -67,6 +68,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 button, input, select { font: inherit; color: inherit; }
 input, select { font-size: 16px; }          /* stops iOS zooming into fields */
 button { cursor: pointer; border: 0; background: none; padding: 0; }
+button:disabled { cursor: default; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em; text-wrap: balance; }
 .num { font-variant-numeric: tabular-nums; }
@@ -80,6 +82,7 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex; flex-direction: column; gap: 16px;
 }
+.stack { display: flex; flex-direction: column; gap: 16px; }
 
 /* header */
 .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -88,7 +91,7 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .month { display: flex; align-items: center; background: var(--surface); border-radius: 999px; box-shadow: var(--shadow); padding: 3px; }
 .month button { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); }
 .month button:active { background: var(--sunk); }
-.month span { font-weight: 700; font-size: .85rem; min-width: 76px; text-align: center; }
+.month span { font-weight: 700; font-size: .85rem; min-width: 76px; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
 
 /* banknote card */
 .note {
@@ -110,20 +113,32 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .note-cols b { display: block; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
 .note-cols .edit { display: inline-flex; gap: 6px; align-items: center; }
 .note-cols .edit svg { opacity: .75; }
-.daily { margin-top: 14px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,.18); border-radius: 14px; padding: 10px 12px; font-size: .88rem; }
-.daily b { font-size: 1.05rem; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.note-cols button:disabled .edit svg { display: none; }
+.daily { margin-top: 14px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,.18); border-radius: 14px; padding: 10px 12px; font-size: .88rem; min-height: 44px; }
+.daily b { margin-left: auto; font-size: 1.05rem; color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.daily button { color: var(--gold); font-weight: 800; text-align: left; width: 100%; }
 .note.neg .big { color: #ffd2cc; }
+.stamp {
+  position: absolute; right: 14px; top: 12px; transform: rotate(-8deg);
+  border: 3px double rgba(255,255,255,.85); border-radius: 9px; padding: 2px 10px 1px;
+  font-family: var(--f-display); font-weight: 800; font-size: .85rem; letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,.92); background: rgba(255,255,255,.06); pointer-events: none;
+}
 
 /* cards & lists */
 .card { background: var(--surface); border-radius: var(--r); padding: 16px; box-shadow: var(--shadow); min-width: 0; }
 .sec { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 6px 4px -4px; }
 .sec h2 { font-size: 1.2rem; font-weight: 700; }
 .link { color: var(--accent); font-weight: 700; font-size: .88rem; }
+.strip-note { display: flex; gap: 10px; align-items: flex-start; background: var(--warn-soft); border-radius: 16px; padding: 12px 14px; font-size: .88rem; }
+.strip-note svg { flex: none; margin-top: 2px; color: var(--warn); }
+.strip-note.info { background: var(--accent-soft); }
+.strip-note.info svg { color: var(--accent); }
 
 .ico { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; flex: none; color: var(--k); background: color-mix(in srgb, var(--k) 15%, transparent); }
 .ico svg { width: 22px; height: 22px; }
 
-/* mini allocation strip on home */
+/* allocation strip on home */
 .strip { display: flex; height: 12px; border-radius: 999px; overflow: hidden; gap: 2px; }
 .strip i { display: block; height: 100%; background: var(--k); }
 .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; margin-top: 14px; }
@@ -134,6 +149,32 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .mini span { display: block; font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mini b { font-size: .92rem; font-variant-numeric: tabular-nums; }
 .mini.over b { color: var(--bad); }
+
+/* trend */
+.cmp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .88rem; margin-bottom: 8px; }
+.delta { font-weight: 800; font-size: .78rem; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.delta.up { background: var(--bad-soft); color: var(--bad); }
+.delta.down { background: var(--accent-soft); color: var(--accent); }
+.delta.same { background: var(--sunk); color: var(--muted); }
+.trend svg { display: block; width: 100%; height: auto; }
+.trend text { font-family: var(--f-body); }
+.trend g[data-ym] { cursor: pointer; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .76rem; color: var(--muted); margin-top: 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 0; border-top: 2px dashed var(--muted); }
+.legend i.b { height: 10px; width: 10px; border: 0; border-radius: 3px; background: var(--accent); }
+
+/* goals */
+.goal { display: block; width: 100%; text-align: left; padding: 12px 0; }
+.goal + .goal { border-top: 1px solid var(--line); }
+.goal-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.goal-top b { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.goal-top span { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--gold-ink); white-space: nowrap; }
+.goal .bar { margin: 8px 0 6px; height: 8px; }
+.goal .bar i { background: linear-gradient(90deg, var(--accent), var(--gold)); }
+.goal small { display: block; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.saved-total { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: .85rem; color: var(--muted); padding-bottom: 10px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.saved-total b { color: var(--ink); font-size: 1rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .tips { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .tips li { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); font-size: .9rem; }
@@ -152,16 +193,28 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .tx .amt { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tx .x { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; color: var(--muted); flex: none; }
 .tx .x.arm { background: var(--bad); color: #fff; width: auto; padding: 0 10px; font-size: .8rem; font-weight: 700; }
+.tx .lock { width: 32px; height: 32px; display: grid; place-items: center; color: var(--muted); opacity: .6; flex: none; }
 .day-head { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); font-weight: 700; margin: 4px 4px 6px; }
 .empty { text-align: center; color: var(--muted); padding: 22px 10px; font-size: .92rem; }
 .empty svg { display: block; margin: 0 auto 8px; opacity: .5; }
 
+/* history search */
+.search { position: relative; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search input { padding-left: 38px; background: var(--surface); box-shadow: var(--shadow); border-color: transparent; }
+.filters { display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 4px; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.fchip { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--surface); box-shadow: var(--shadow); font-size: .82rem; font-weight: 700; white-space: nowrap; }
+.fchip i { width: 8px; height: 8px; border-radius: 3px; background: var(--k); }
+.fchip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
 /* budget view */
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--sunk); border-radius: 14px; padding: 3px; gap: 3px; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
 .seg button { padding: 9px 4px; border-radius: 11px; font-weight: 700; font-size: .85rem; color: var(--muted); }
 .seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 .preset-desc { color: var(--muted); font-size: .85rem; margin: 10px 2px 0; }
-.custom-tag { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
+.custom-tag { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-left: 6px; letter-spacing: 0; text-transform: none; }
 .split-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: .8rem; color: var(--muted); }
 .split-legend b { color: var(--ink); }
 .split-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 6px; background: var(--k); }
@@ -176,6 +229,7 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .cat .nom { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .cat .ctl { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 6px; }
 .cat input[type=range] { flex: 1; min-width: 0; accent-color: var(--k); height: 28px; }
+.cat input:disabled { opacity: .55; }
 .pct { display: inline-flex; align-items: center; gap: 1px; background: var(--sunk); border-radius: 10px; padding: 4px 8px; font-weight: 700; }
 .pct input { width: 2.6ch; border: 0; background: transparent; text-align: right; font-weight: 700; padding: 0; -moz-appearance: textfield; }
 .pct input::-webkit-outer-spin-button, .pct input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -201,7 +255,6 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .set-row div { flex: 1; min-width: 0; }
 .set-row b { display: block; font-weight: 600; }
 .set-row span { font-size: .8rem; color: var(--muted); }
-.set-row .chev { color: var(--muted); }
 .badge { font-size: .72rem; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
 .badge.warn { background: var(--warn-soft); color: var(--warn); }
 .steps { margin: 8px 0 0; padding-left: 20px; font-size: .9rem; }
@@ -239,9 +292,9 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .scrim.open { opacity: 1; }
 .grab { width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 4px auto 12px; }
 .sheet h2 { font-size: 1.35rem; margin-bottom: 14px; }
-.sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.sheet-head h2 { margin: 0; }
-.close { color: var(--muted); font-weight: 700; padding: 6px 4px; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.sheet-head h2 { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.close { color: var(--muted); font-weight: 700; padding: 6px 4px; flex: none; }
 .amount { display: flex; align-items: baseline; justify-content: center; gap: 6px; padding: 8px 0 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
 .amount span { font-family: var(--f-display); font-size: 1.6rem; font-weight: 700; color: var(--muted); }
 .amount input { width: 100%; max-width: 320px; border: 0; background: transparent; font-family: var(--f-display); font-weight: 800; font-size: 2.8rem; text-align: center; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; padding: 0; min-width: 0; }
@@ -252,10 +305,18 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 .chip[aria-checked="true"] { border-color: var(--k); background: color-mix(in srgb, var(--k) 10%, var(--surface)); }
 .chip small { display: block; font-weight: 600; color: var(--muted); font-size: .66rem; font-variant-numeric: tabular-nums; }
 .form-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-bottom: 14px; }
-.form-grid label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.form-grid label, .lbl-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .err { color: var(--bad); font-size: .85rem; min-height: 1.2em; margin: -6px 0 8px; text-align: center; }
 .quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: -4px 0 14px; }
 .quick button { background: var(--sunk); border-radius: 999px; padding: 6px 12px; font-size: .82rem; font-weight: 700; }
+.goal-big { text-align: center; margin-bottom: 14px; }
+.goal-big b { display: block; font-family: var(--f-display); font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.goal-big .bar { height: 10px; margin: 10px 0 6px; }
+.goal-big .bar i { background: linear-gradient(90deg, var(--accent), var(--gold)); }
+.goal-big small { color: var(--muted); font-size: .85rem; }
+.pick { display: flex; flex-direction: column; gap: 8px; }
+.pick button { display: flex; justify-content: space-between; gap: 10px; text-align: left; padding: 14px; border-radius: 14px; background: var(--sunk); font-weight: 700; }
+.pick button span { color: var(--muted); font-weight: 600; font-size: .85rem; white-space: nowrap; }
 
 /* toast */
 .toast { position: fixed; left: 50%; z-index: 40; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
@@ -265,9 +326,11 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 /* onboarding */
 .onboard { max-width: 560px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; gap: 18px;
   padding: calc(env(safe-area-inset-top, 0px) + 28px) max(20px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 24px) max(20px, env(safe-area-inset-left, 0px)); }
+.ob-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ob-top .seg { width: 120px; }
 .onboard .logo { width: 64px; height: 64px; border-radius: 18px; box-shadow: var(--shadow); }
 .onboard h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.05; }
-.onboard p.lead { color: var(--muted); margin: 0; font-size: 1rem; }
+.onboard p.lead { color: var(--muted); margin: 8px 0 0; font-size: 1rem; }
 .ob-money { display: flex; align-items: baseline; gap: 8px; border-bottom: 2px solid var(--ink); padding-bottom: 4px; }
 .ob-money:focus-within { border-color: var(--accent); }
 .ob-money span { font-family: var(--f-display); font-weight: 700; font-size: 1.6rem; color: var(--muted); }
@@ -283,23 +346,26 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 
 <!-- ===== onboarding (first run) ===== -->
 <main class="onboard" id="onboard" hidden>
-  <img class="logo" src="apple-touch-icon.png" alt="">
-  <div>
-    <h1>Atur uangmu bulan ini</h1>
-    <p class="lead" style="margin-top:8px">Masukkan uang yang bisa kamu pakai sebulan. Kami bagi otomatis ke makan, tagihan, hiburan, tabungan, dan lainnya.</p>
+  <div class="ob-top">
+    <img class="logo" src="apple-touch-icon.png" alt="">
+    <div class="seg two" role="radiogroup" aria-label="Bahasa / Language" id="obLang"></div>
   </div>
   <div>
-    <label class="label" for="obIncome">Gaji / uang saku per bulan</label>
+    <h1 data-i18n="ob.title"></h1>
+    <p class="lead" data-i18n="ob.lead"></p>
+  </div>
+  <div>
+    <label class="label" for="obIncome" data-i18n="ob.incomeLbl"></label>
     <div class="ob-money"><span>Rp</span><input id="obIncome" inputmode="numeric" autocomplete="off" placeholder="0"></div>
   </div>
   <div>
-    <span class="label" id="obPresetLbl">Gaya pembagian</span>
+    <span class="label" id="obPresetLbl" data-i18n="budget.presetLbl"></span>
     <div class="seg" role="radiogroup" aria-labelledby="obPresetLbl" id="obPresets" style="margin-top:8px"></div>
     <p class="preset-desc" id="obDesc"></p>
   </div>
   <div class="card"><div class="ob-preview" id="obPreview"></div></div>
   <div class="ob-cta">
-    <button class="btn block" id="obStart" type="button">Mulai atur uang</button>
+    <button class="btn block" id="obStart" type="button" data-i18n="ob.start"></button>
     <p class="err" id="obErr" style="margin-top:8px"></p>
   </div>
 </main>
@@ -309,55 +375,75 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
   <div class="app">
     <header class="head">
       <div>
-        <div class="sub" id="greet">Halo</div>
-        <h1 id="title">Beranda</h1>
+        <div class="sub" id="greet"></div>
+        <h1 id="title"></h1>
       </div>
-      <div class="month" aria-label="Pilih bulan">
-        <button id="prevM" type="button" aria-label="Bulan sebelumnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="month" data-i18n-aria="a.monthNav">
+        <button id="prevM" type="button" data-i18n-aria="a.prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
         <span id="monthLabel" class="num"></span>
-        <button id="nextM" type="button" aria-label="Bulan berikutnya"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        <button id="nextM" type="button" data-i18n-aria="a.next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
       </div>
     </header>
 
     <div class="install" id="installHint" hidden>
-      <p><b>Pasang di iPhone:</b> tap tombol Bagikan <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 3v12M8 7l4-4 4 4M5 12v7h14v-7"/></svg> di Safari, lalu pilih <b>Tambah ke Layar Utama</b>.</p>
-      <button type="button" id="installClose" aria-label="Tutup">×</button>
+      <p data-i18n-html="install.html"></p>
+      <button type="button" id="installClose" data-i18n-aria="a.close">×</button>
     </div>
 
     <!-- HOME -->
     <section id="v-home" class="view">
-      <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="stack">
         <article class="note" id="note">
           <svg class="guil" id="guil" viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
-          <div class="note-top"><span class="label">Sisa uang bulan ini</span><span class="serial" id="serial">AU 000000</span></div>
+          <div class="note-top"><span class="label" id="hLbl"></span><span class="serial" id="serial">AU 000000</span></div>
+          <div class="stamp" id="stamp" hidden data-i18n="stamp"></div>
           <div class="big" id="hLeft"><small>Rp</small>0</div>
           <div class="meter"><i id="hMeter"></i></div>
           <div class="note-cols">
-            <button type="button" id="editIncome" aria-label="Ubah total uang"><span class="label edit">Total uang <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span><b id="hIncome">Rp 0</b></button>
-            <div><span class="label">Terpakai</span><b id="hSpent">Rp 0</b></div>
+            <button type="button" id="editIncome"><span class="label edit"><span data-i18n="hero.total"></span> <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span><b id="hIncome">Rp 0</b></button>
+            <div><span class="label" data-i18n="hero.spent"></span><b id="hSpent">Rp 0</b></div>
           </div>
-          <div class="daily"><span id="hDailyLbl">Aman dipakai hari ini</span><b id="hDaily" style="margin-left:auto">Rp 0</b></div>
+          <div class="daily" id="hDaily"></div>
         </article>
 
-        <div class="sec"><h2>Pembagian</h2><button class="link" type="button" data-go="budget">Atur</button></div>
+        <div class="strip-note" id="graceNote" hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span id="graceText"></span>
+        </div>
+
+        <div class="sec"><h2 data-i18n="sec.alloc"></h2><button class="link" type="button" data-go="budget" data-i18n="link.manage"></button></div>
         <div class="card">
           <div class="strip" id="homeStrip"></div>
           <div class="mini-grid" id="homeMini"></div>
         </div>
 
-        <div class="sec"><h2>Saran untukmu</h2></div>
+        <div class="sec"><h2 data-i18n="sec.trend"></h2></div>
+        <div class="card trend">
+          <div class="cmp" id="cmpLine"></div>
+          <svg id="trendSvg" viewBox="0 0 320 150" role="img"></svg>
+          <div class="legend"><span><i class="b"></i><span data-i18n="trend.bar"></span></span><span><i></i><span data-i18n="trend.line"></span></span></div>
+        </div>
+
+        <div class="sec"><h2 data-i18n="sec.goals"></h2><button class="link" type="button" id="newGoalLink" data-i18n="link.newGoal"></button></div>
+        <div class="card" id="goalCard"></div>
+
+        <div class="sec"><h2 data-i18n="sec.tips"></h2></div>
         <ul class="tips" id="tips"></ul>
 
-        <div class="sec"><h2>Terakhir dicatat</h2><button class="link" type="button" data-go="history">Semua</button></div>
+        <div class="sec"><h2 data-i18n="sec.recent"></h2><button class="link" type="button" data-go="history" data-i18n="link.all"></button></div>
         <div class="card"><ul class="tx-list" id="recent"></ul></div>
       </div>
     </section>
 
     <!-- BUDGET -->
     <section id="v-budget" class="view" hidden>
-      <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="stack">
+        <div class="strip-note" id="budgetNote" hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span id="budgetNoteText"></span>
+        </div>
         <div class="card">
-          <span class="label" id="presetLbl">Gaya pembagian <span class="custom-tag" id="customTag" hidden>Kustom</span></span>
+          <span class="label" id="presetLbl"><span data-i18n="budget.presetLbl"></span><span class="custom-tag" id="customTag" hidden data-i18n="custom"></span></span>
           <div class="seg" role="radiogroup" aria-labelledby="presetLbl" id="presets" style="margin-top:8px"></div>
           <p class="preset-desc" id="presetDesc"></p>
           <div class="strip" id="splitStrip" style="margin-top:14px"></div>
@@ -367,8 +453,8 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
         <div class="card">
           <div id="catList"></div>
           <form class="add-row" id="addCatForm">
-            <input class="field" id="newCat" maxlength="40" placeholder="Kelompok baru, mis. Cicilan motor" aria-label="Nama kelompok baru">
-            <button class="btn" type="submit">Tambah</button>
+            <input class="field" id="newCat" maxlength="40" data-i18n-ph="budget.addPh" data-i18n-aria="budget.addPh">
+            <button class="btn" type="submit" data-i18n="budget.add"></button>
           </form>
         </div>
       </div>
@@ -376,51 +462,55 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 
     <!-- HISTORY -->
     <section id="v-history" class="view" hidden>
-      <div id="historyList" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="stack" style="gap:12px">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input class="field" type="search" id="hSearch" autocomplete="off" data-i18n-ph="hist.searchPh" data-i18n-aria="hist.searchPh">
+        </div>
+        <div class="filters" id="hFilters"></div>
+        <div id="historyList" class="stack" style="gap:14px"></div>
+      </div>
     </section>
 
     <!-- MORE -->
     <section id="v-more" class="view" hidden>
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div class="sec"><h2>Data kamu</h2></div>
+      <div class="stack">
+        <div class="sec"><h2 data-i18n="more.language"></h2></div>
+        <div class="card"><div class="seg two" role="radiogroup" aria-label="Bahasa / Language" id="langSeg"></div></div>
+
+        <div class="sec"><h2 data-i18n="more.data"></h2></div>
         <div class="card">
-          <div class="set-row"><div><b>Penyimpanan</b><span id="storeInfo">Memeriksa…</span></div><span class="badge" id="storeBadge">…</span></div>
-          <div class="set-row"><div><b>Terakhir disimpan</b><span id="savedAt">–</span></div></div>
-          <div class="set-row"><div><b>Cadangan terakhir</b><span id="backupAt">Belum pernah</span></div></div>
+          <div class="set-row"><div><b data-i18n="more.storage"></b><span id="storeInfo"></span></div><span class="badge" id="storeBadge">…</span></div>
+          <div class="set-row"><div><b data-i18n="more.lastSaved"></b><span id="savedAt">–</span></div></div>
+          <div class="set-row"><div><b data-i18n="more.lastBackup"></b><span id="backupAt"></span></div></div>
+          <div class="set-row"><div><b data-i18n="more.savedTotal"></b><span id="savedSince"></span></div><b id="savedTotalMore" class="num"></b></div>
         </div>
-        <div class="card" style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn block" type="button" id="exportBtn">Buat cadangan (ekspor)</button>
-          <button class="btn block soft" type="button" id="importBtn">Pulihkan dari cadangan</button>
+        <div class="card stack" style="gap:10px">
+          <button class="btn block" type="button" id="exportBtn" data-i18n="more.export"></button>
+          <button class="btn block soft" type="button" id="importBtn" data-i18n="more.import"></button>
           <input type="file" id="importFile" accept=".json,application/json" hidden>
-          <p class="preset-desc" style="margin:0">Cadangan berupa file .json. Simpan ke Files, iCloud Drive, atau kirim ke dirimu sendiri. Pakai ini juga saat pindah HP.</p>
+          <p class="preset-desc" style="margin:0" data-i18n="more.backupNote"></p>
         </div>
 
-        <div class="sec"><h2>Pasang di iPhone</h2></div>
-        <div class="card">
-          <ol class="steps">
-            <li>Buka aplikasi ini di <b>Safari</b>.</li>
-            <li>Tap tombol <b>Bagikan</b> (kotak dengan panah ke atas).</li>
-            <li>Pilih <b>Tambah ke Layar Utama</b>, lalu <b>Tambah</b>.</li>
-            <li>Buka dari ikon <b>Atur Uang</b> di layar utama. Bisa dipakai tanpa internet.</li>
-          </ol>
-        </div>
+        <div class="sec"><h2 data-i18n="more.install"></h2></div>
+        <div class="card"><ol class="steps" data-i18n-html="more.steps"></ol></div>
 
-        <div class="sec"><h2>Lainnya</h2></div>
+        <div class="sec"><h2 data-i18n="more.other"></h2></div>
         <div class="card">
-          <button class="set-row" type="button" id="resetBtn" style="width:100%;text-align:left"><div><b style="color:var(--bad)">Hapus semua data</b><span>Mulai dari awal. Tidak bisa dibatalkan.</span></div></button>
+          <button class="set-row" type="button" id="resetBtn" style="width:100%;text-align:left"><div><b style="color:var(--bad)" data-i18n="more.reset"></b><span data-i18n="more.resetSub"></span></div></button>
         </div>
-        <p class="preset-desc" style="text-align:center">Atur Uang · versi 1.0 · data tidak pernah dikirim ke server mana pun</p>
+        <p class="preset-desc" style="text-align:center" data-i18n="more.version"></p>
       </div>
     </section>
   </div>
 
   <div class="tabbar">
-    <nav aria-label="Menu utama">
-      <button class="tab" type="button" data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>Beranda</button>
-      <button class="tab" type="button" data-tab="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>Anggaran</button>
-      <button class="fab" type="button" id="fab" aria-label="Catat pengeluaran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
-      <button class="tab" type="button" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Riwayat</button>
-      <button class="tab" type="button" data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Lainnya</button>
+    <nav>
+      <button class="tab" type="button" data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span data-i18n="tab.home"></span></button>
+      <button class="tab" type="button" data-tab="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg><span data-i18n="tab.budget"></span></button>
+      <button class="fab" type="button" id="fab" data-i18n-aria="a.add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="tab" type="button" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span data-i18n="tab.history"></span></button>
+      <button class="tab" type="button" data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span data-i18n="tab.more"></span></button>
     </nav>
   </div>
 </div>
@@ -430,37 +520,71 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 
 <section class="sheet" id="sh-add" role="dialog" aria-modal="true" aria-labelledby="addTitle" hidden>
   <div class="grab"></div>
-  <div class="sheet-head"><h2 id="addTitle">Catat pengeluaran</h2><button class="close" type="button" data-close>Batal</button></div>
+  <div class="sheet-head"><h2 id="addTitle" data-i18n="a.add"></h2><button class="close" type="button" data-close data-i18n="btn.cancel"></button></div>
   <form id="addForm" novalidate>
-    <div class="amount"><span>Rp</span><input id="addAmt" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Jumlah pengeluaran"></div>
+    <div class="amount"><span>Rp</span><input id="addAmt" inputmode="numeric" autocomplete="off" placeholder="0" data-i18n-aria="add.amountAria"></div>
     <div class="quick" id="quickAmt"></div>
-    <div class="chips" role="radiogroup" aria-label="Kelompok" id="addCats"></div>
+    <div class="chips" role="radiogroup" id="addCats"></div>
     <div class="form-grid">
-      <label><span class="label">Tanggal</span><input class="field" type="date" id="addDate"></label>
-      <label><span class="label">Catatan</span><input class="field" id="addNote" maxlength="80" placeholder="Nasi padang, bensin…"></label>
+      <label><span class="label" data-i18n="add.date"></span><input class="field" type="date" id="addDate"></label>
+      <label><span class="label" data-i18n="add.note"></span><input class="field" id="addNote" maxlength="80" data-i18n-ph="add.notePh"></label>
     </div>
     <p class="err" id="addErr" role="alert"></p>
-    <button class="btn block" type="submit">Simpan</button>
+    <button class="btn block" type="submit" data-i18n="btn.save"></button>
   </form>
 </section>
 
 <section class="sheet" id="sh-income" role="dialog" aria-modal="true" aria-labelledby="incTitle" hidden>
   <div class="grab"></div>
-  <div class="sheet-head"><h2 id="incTitle">Total uang per bulan</h2><button class="close" type="button" data-close>Batal</button></div>
+  <div class="sheet-head"><h2 id="incTitle" data-i18n="inc.title"></h2><button class="close" type="button" data-close data-i18n="btn.cancel"></button></div>
   <form id="incForm" novalidate>
-    <div class="amount"><span>Rp</span><input id="incAmt" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Total uang per bulan"></div>
-    <p class="preset-desc" style="text-align:center;margin:-4px 0 16px">Gaji, uang saku, atau total pemasukan setelah potongan. Jatah tiap kelompok dihitung ulang otomatis.</p>
-    <button class="btn block" type="submit">Simpan</button>
+    <div class="amount"><span>Rp</span><input id="incAmt" inputmode="numeric" autocomplete="off" placeholder="0" data-i18n-aria="inc.title"></div>
+    <p class="preset-desc" style="text-align:center;margin:-4px 0 16px" data-i18n="inc.desc"></p>
+    <button class="btn block" type="submit" data-i18n="btn.save"></button>
   </form>
+</section>
+
+<section class="sheet" id="sh-goal" role="dialog" aria-modal="true" aria-labelledby="goalNewTitle" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="goalNewTitle" data-i18n="goal.new"></h2><button class="close" type="button" data-close data-i18n="btn.cancel"></button></div>
+  <form id="goalForm" novalidate class="stack" style="gap:14px">
+    <label class="lbl-field"><span class="label" data-i18n="goal.name"></span><input class="field" id="goalName" maxlength="40" data-i18n-ph="goal.namePh"></label>
+    <label class="lbl-field"><span class="label" data-i18n="goal.amount"></span><input class="field num" id="goalAmt" inputmode="numeric" autocomplete="off" placeholder="6.000.000"></label>
+    <p class="err" id="goalErr" role="alert" style="margin:0"></p>
+    <button class="btn block" type="submit" data-i18n="btn.save"></button>
+  </form>
+</section>
+
+<section class="sheet" id="sh-goal-detail" role="dialog" aria-modal="true" aria-labelledby="gdTitle" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="gdTitle"></h2><button class="close" type="button" data-close data-i18n="a.close"></button></div>
+  <div class="goal-big" id="gdBig"></div>
+  <form id="depForm" novalidate>
+    <span class="label" data-i18n="goal.depositLbl"></span>
+    <div class="amount" style="margin-top:4px"><span>Rp</span><input id="depAmt" inputmode="numeric" autocomplete="off" placeholder="0" data-i18n-aria="goal.depositLbl"></div>
+    <div class="quick" id="depQuick"></div>
+    <p class="err" id="depErr" role="alert"></p>
+    <button class="btn block" type="submit" data-i18n="goal.deposit"></button>
+  </form>
+  <div class="sec" style="margin:20px 0 6px"><h2 style="font-size:1.05rem;margin:0" data-i18n="goal.history"></h2></div>
+  <ul class="tx-list" id="gdList"></ul>
+  <button class="btn block soft" type="button" id="gdDelete" style="margin-top:14px;color:var(--bad)" data-i18n="goal.delete"></button>
+</section>
+
+<section class="sheet" id="sh-pick" role="dialog" aria-modal="true" aria-labelledby="pickTitle" hidden>
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="pickTitle" data-i18n="pick.title"></h2><button class="close" type="button" data-close data-i18n="btn.cancel"></button></div>
+  <p id="pickText" style="margin:0 0 14px;color:var(--muted)"></p>
+  <div class="pick" id="pickList"></div>
 </section>
 
 <section class="sheet" id="sh-confirm" role="dialog" aria-modal="true" aria-labelledby="cfTitle" hidden>
   <div class="grab"></div>
-  <h2 id="cfTitle">Yakin?</h2>
+  <h2 id="cfTitle"></h2>
   <p id="cfText" style="margin:0 0 18px;color:var(--muted)"></p>
-  <div style="display:flex;flex-direction:column;gap:10px">
-    <button class="btn block danger" type="button" id="cfOk">Ya</button>
-    <button class="btn block soft" type="button" data-close>Batal</button>
+  <div class="stack" style="gap:10px">
+    <button class="btn block danger" type="button" id="cfOk"></button>
+    <button class="btn block soft" type="button" data-close data-i18n="btn.cancel"></button>
   </div>
 </section>
 
@@ -468,26 +592,207 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
 
 <script>
 (() => {
+  // ================= i18n =================
+  const I18N = {
+    id: {
+      "greet.morning": "Selamat pagi", "greet.noon": "Selamat siang", "greet.afternoon": "Selamat sore", "greet.night": "Selamat malam",
+      "tab.home": "Beranda", "tab.budget": "Anggaran", "tab.history": "Riwayat", "tab.more": "Lainnya",
+      "a.prev": "Bulan sebelumnya", "a.next": "Bulan berikutnya", "a.monthNav": "Pilih bulan", "a.add": "Catat pengeluaran", "a.close": "Tutup",
+      "btn.save": "Simpan", "btn.cancel": "Batal", "del": "Hapus", "sure": "Yakin?",
+      "ob.title": "Atur uangmu bulan ini", "ob.lead": "Masukkan uang yang bisa kamu pakai sebulan. Kami bagi otomatis ke makan, tagihan, hiburan, tabungan, dan lainnya.",
+      "ob.incomeLbl": "Gaji / uang saku per bulan", "ob.start": "Mulai atur uang", "ob.err": "Isi dulu jumlah uangmu per bulan, misalnya 3.000.000.",
+      "install.html": "<b>Pasang di iPhone:</b> tap tombol Bagikan di Safari, lalu pilih <b>Tambah ke Layar Utama</b>.",
+      "hero.left": "Sisa uang bulan ini", "hero.leftFuture": "Rencana uang", "hero.saved": "Berhasil ditabung", "hero.over": "Lebih besar pasak", "hero.total": "Total uang", "hero.spent": "Terpakai",
+      "hero.safeToday": "Aman dipakai hari ini · {n} hari lagi", "hero.avgDay": "Rata-rata per hari · {n} hari",
+      "hero.noTx": "Tidak ada catatan di bulan ini", "hero.toGoal": "Masukkan sisa ini ke target ›", "hero.makeGoal": "Buat target untuk menyimpan sisa ini ›",
+      "hero.inGoal": "Sudah masuk ke target {name}", "hero.finalAfter": "Angka final setelah {date}", "hero.overNote": "Pengeluaran melebihi total uang",
+      "stamp": "Ditutup",
+      "grace.note": "Pengeluaran {month} masih bisa dicatat sampai {date}. Setelah itu bulan ditutup dan tidak bisa diubah.",
+      "sec.alloc": "Pembagian", "link.manage": "Atur", "sec.trend": "Tren pengeluaran", "sec.goals": "Target tabungan", "link.newGoal": "+ Baru",
+      "sec.tips": "Saran untukmu", "sec.recent": "Terakhir dicatat", "link.all": "Semua",
+      "trend.bar": "Pengeluaran", "trend.line": "Total uang",
+      "cmp.up": "naik {p}%", "cmp.down": "turun {p}%", "cmp.same": "sama",
+      "cmp.line": "{delta} dibanding {prev}{range}", "cmp.range": " (tanggal 1–{d})", "cmp.none": "Belum ada catatan bulan lalu untuk dibandingkan.",
+      "cmp.vs": "{a} vs {b}",
+      "goal.empty": "Belum ada target. Buat target seperti \"HP baru\" atau \"Liburan\", lalu setor sedikit demi sedikit.", "goal.create": "Buat target",
+      "goal.progress": "{saved} dari {target}", "goal.eta": "Perkiraan tercapai {month} kalau setor {amt}/bulan", "goal.done": "Target tercapai",
+      "goal.noEta": "Atur jatah Tabungan supaya perkiraan bisa dihitung",
+      "goal.new": "Target baru", "goal.name": "Nama target", "goal.namePh": "HP baru, liburan, DP motor…", "goal.amount": "Jumlah target (Rp)",
+      "goal.depositLbl": "Tambah setoran", "goal.deposit": "Setor", "goal.quick": "Jatah tabungan · {amt}", "goal.history": "Riwayat setoran",
+      "goal.noDeposits": "Belum ada setoran.", "goal.delete": "Hapus target", "goal.fromMonth": "Sisa {month}", "goal.manual": "Setoran",
+      "goal.savedTotal": "Total berhasil ditabung sejak {month}",
+      "pick.title": "Masukkan ke target", "pick.text": "{amt} sisa dari {month} akan dicatat sebagai setoran.",
+      "err.goalName": "Isi nama targetnya.", "err.goalAmt": "Isi jumlah targetnya.", "err.amt": "Isi jumlahnya dulu, misalnya 25.000.",
+      "err.date": "Pilih tanggal pengeluaran.", "err.cat": "Pilih kelompoknya.", "err.locked": "{month} sudah ditutup. Pilih tanggal mulai {date}.",
+      "toast.ready": "Siap! Catat pengeluaran pertamamu dengan tombol +", "toast.added": "Tercatat {amt} · {cat}", "toast.txDeleted": "Catatan dihapus",
+      "toast.income": "Total uang diperbarui", "toast.preset": "Gaya {name} dipakai", "toast.catDeleted": "{name} dihapus", "toast.catAdded": "{name} ditambahkan. Atur persennya.",
+      "toast.backup": "Cadangan dibuat", "toast.restored": "Data dipulihkan", "toast.badFile": "File itu bukan cadangan Atur Uang.",
+      "toast.saveFail": "Gagal menyimpan. Penyimpanan HP mungkin penuh.", "toast.needCat": "Tambahkan minimal satu kelompok dulu di Anggaran.",
+      "toast.goalSaved": "Target {name} dibuat", "toast.deposit": "{amt} masuk ke {name}", "toast.goalDeleted": "Target dihapus", "toast.depDeleted": "Setoran dihapus",
+      "toast.locked": "Bulan ini sudah ditutup", "toast.lang": "Bahasa: Indonesia",
+      "budget.presetLbl": "Gaya pembagian", "custom": "Kustom", "budget.customDesc": "Persentase kamu atur sendiri. Ketuk salah satu gaya di atas untuk kembali ke rekomendasi.",
+      "budget.total100": "Total 100% · semua uang punya tugas", "budget.totalOff": "Total {t}% · {what}", "budget.excess": "kelebihan {n}%", "budget.remain": "sisa {n}%", "budget.fix": "Pas-kan",
+      "budget.addPh": "Kelompok baru, mis. Cicilan motor", "budget.add": "Tambah",
+      "budget.locked": "{month} sudah ditutup. Anggarannya disimpan apa adanya dan tidak bisa diubah.",
+      "budget.pastGrace": "Anggaran {month} sudah disimpan dan tidak bisa diubah. Pengeluarannya masih bisa dicatat sampai {date}.",
+      "row.used": "Terpakai {amt}", "row.over": "Lewat {amt}", "row.setAside": "Sisihkan {amt}", "row.left": "Sisa {amt}", "row.perDay": "{amt}/hari",
+      "group.kebutuhan": "Kebutuhan", "group.keinginan": "Keinginan", "group.tabungan": "Tabungan", "group.other": "Lainnya",
+      "preset.seimbang": "Seimbang", "preset.hemat": "Hemat", "preset.mahasiswa": "Pemula",
+      "pdesc.seimbang": "Pola 50/30/20: separuh untuk kebutuhan, 30% keinginan, 20% ditabung.",
+      "pdesc.hemat": "Keinginan dipangkas jadi 20% supaya 30% bisa ditabung. Cocok saat mengejar target.",
+      "pdesc.mahasiswa": "Untuk uang saku atau gaji pertama: porsi makan dan transport lebih besar, tetap menabung 15%.",
+      "cat.makan": "Makan & Minum", "cat.tagihan": "Tempat Tinggal", "cat.transport": "Transportasi", "cat.hiburan": "Hiburan & Jajan",
+      "cat.belanja": "Belanja Pribadi", "cat.sosial": "Sedekah & Sosial", "cat.darurat": "Dana Darurat", "cat.tabungan": "Tabungan & Investasi",
+      "sub.makan": "Dapur, makan di luar, kopi, galon", "sub.tagihan": "Kos/sewa, listrik, air, internet, pulsa", "sub.transport": "Bensin, ojol, KRL, parkir, tol",
+      "sub.hiburan": "Nongkrong, nonton, streaming", "sub.belanja": "Pakaian, skincare, hobi, checkout", "sub.sosial": "Zakat, kondangan, kado, keluarga",
+      "sub.darurat": "Obat, berobat, perbaikan mendadak", "sub.tabungan": "Sisihkan di awal bulan",
+      "add.date": "Tanggal", "add.note": "Catatan", "add.notePh": "Nasi padang, bensin…", "add.amountAria": "Jumlah pengeluaran", "add.left": "sisa {amt}",
+      "inc.title": "Total uang per bulan", "inc.desc": "Gaji, uang saku, atau total pemasukan setelah potongan. Berlaku untuk bulan ini dan seterusnya; bulan yang sudah lewat tidak berubah.",
+      "hist.searchPh": "Cari catatan, kelompok, atau jumlah", "hist.allMonths": "Semua bulan", "hist.total": "Total {month}", "hist.results": "Hasil pencarian",
+      "hist.count": "{n} catatan", "hist.empty": "Belum ada pengeluaran di {month}.", "hist.noMatch": "Tidak ada catatan yang cocok.",
+      "recent.empty": "Belum ada pengeluaran di {month}. Tap tombol + untuk mencatat.",
+      "tx.deletedCat": "Kelompok terhapus", "tx.locked": "Terkunci",
+      "more.language": "Bahasa", "more.data": "Data kamu", "more.storage": "Penyimpanan", "more.lastSaved": "Terakhir disimpan", "more.lastBackup": "Cadangan terakhir",
+      "more.never": "Belum pernah. Disarankan sebulan sekali.", "more.savedTotal": "Total berhasil ditabung", "more.savedSince": "Sejak {month}, dari bulan yang sudah ditutup",
+      "more.savedNone": "Muncul setelah bulan pertama ditutup",
+      "store.ok2": "Tersimpan otomatis di iPhone ini (2 salinan)", "store.ok1": "Tersimpan otomatis di perangkat ini", "store.fail": "Gagal menyimpan. Buat cadangan sekarang.",
+      "badge.perm": "Permanen", "badge.active": "Aktif", "badge.problem": "Bermasalah",
+      "more.export": "Buat cadangan (ekspor)", "more.import": "Pulihkan dari cadangan",
+      "more.backupNote": "Cadangan berupa file .json. Simpan ke Files, iCloud Drive, atau kirim ke dirimu sendiri. Pakai ini juga saat pindah HP.",
+      "more.install": "Pasang di iPhone",
+      "more.steps": "<li>Buka aplikasi ini di <b>Safari</b>.</li><li>Tap tombol <b>Bagikan</b> (kotak dengan panah ke atas).</li><li>Pilih <b>Tambah ke Layar Utama</b>, lalu <b>Tambah</b>.</li><li>Buka dari ikon <b>Atur Uang</b> di layar utama. Bisa dipakai tanpa internet.</li>",
+      "more.other": "Lainnya", "more.reset": "Hapus semua data", "more.resetSub": "Mulai dari awal. Tidak bisa dibatalkan.",
+      "more.version": "Atur Uang · versi 1.1 · data tidak pernah dikirim ke server mana pun",
+      "cf.restoreTitle": "Pulihkan cadangan?", "cf.restoreText": "Data sekarang akan diganti dengan cadangan tanggal {date} ({n} catatan pengeluaran).", "cf.restoreOk": "Ganti dengan cadangan",
+      "cf.resetTitle": "Hapus semua data?", "cf.resetText": "Semua pengaturan, catatan pengeluaran, dan target di HP ini akan dihapus. Buat cadangan dulu kalau masih butuh.", "cf.resetOk": "Hapus semua",
+      "cf.goalTitle": "Hapus target?", "cf.goalText": "Target {name} dan semua riwayat setorannya akan dihapus.",
+      "tip.noIncome": "Isi total uang bulan ini dengan tap \"Total uang\" di kartu atas.",
+      "tip.pct": "Total persentase {t}%. Atur di tab Anggaran supaya tepat 100%.",
+      "tip.over": "{cat} lewat {amt}. Tutup dari jatah keinginan, jangan dari tabungan.",
+      "tip.near": "{cat} sudah {p}%. Sisa {amt} untuk {n} hari, sekitar {day} per hari.",
+      "tip.food": "Jatah makan sekitar {day} per hari, atau {meal} sekali makan.",
+      "tip.save": "Pindahkan {amt} ke rekening tabungan begitu uang masuk. Yang tidak terlihat, tidak terpakai.",
+      "tip.starter": "Dengan pemasukan di bawah Rp 3 juta, gaya Pemula biasanya lebih realistis untuk makan dan transport.",
+      "tip.backup": "Sudah lebih dari 30 hari sejak cadangan terakhir. Buat cadangan di tab Lainnya supaya data aman kalau ganti HP.",
+      "tip.rise": "{cat} naik {p}% dibanding {prev} ({amt} lebih banyak). Coba rem sedikit.",
+      "backup.file": "atur-uang-cadangan", "backup.title": "Cadangan Atur Uang",
+    },
+    en: {
+      "greet.morning": "Good morning", "greet.noon": "Good afternoon", "greet.afternoon": "Good afternoon", "greet.night": "Good evening",
+      "tab.home": "Home", "tab.budget": "Budget", "tab.history": "History", "tab.more": "More",
+      "a.prev": "Previous month", "a.next": "Next month", "a.monthNav": "Choose month", "a.add": "Add expense", "a.close": "Close",
+      "btn.save": "Save", "btn.cancel": "Cancel", "del": "Delete", "sure": "Sure?",
+      "ob.title": "Plan your money this month", "ob.lead": "Enter how much you can spend in a month. We split it for you into food, bills, fun, savings and more.",
+      "ob.incomeLbl": "Monthly salary / allowance", "ob.start": "Start budgeting", "ob.err": "Enter your monthly money first, for example 3,000,000.",
+      "install.html": "<b>Install on iPhone:</b> tap Share in Safari, then choose <b>Add to Home Screen</b>.",
+      "hero.left": "Money left this month", "hero.leftFuture": "Planned money", "hero.saved": "Saved this month", "hero.over": "Overspent by", "hero.total": "Total money", "hero.spent": "Spent",
+      "hero.safeToday": "Safe to spend today · {n} days left", "hero.avgDay": "Per day · {n} days",
+      "hero.noTx": "No expenses recorded this month", "hero.toGoal": "Put this into a goal ›", "hero.makeGoal": "Create a goal to keep this ›",
+      "hero.inGoal": "Added to goal {name}", "hero.finalAfter": "Final after {date}", "hero.overNote": "Spending went over your total",
+      "stamp": "Closed",
+      "grace.note": "{month} expenses can still be added until {date}. After that the month is closed for good.",
+      "sec.alloc": "Allocation", "link.manage": "Manage", "sec.trend": "Spending trend", "sec.goals": "Savings goals", "link.newGoal": "+ New",
+      "sec.tips": "Tips for you", "sec.recent": "Recent", "link.all": "See all",
+      "trend.bar": "Spending", "trend.line": "Total money",
+      "cmp.up": "up {p}%", "cmp.down": "down {p}%", "cmp.same": "flat",
+      "cmp.line": "{delta} vs {prev}{range}", "cmp.range": " (days 1–{d})", "cmp.none": "No expenses last month to compare with yet.",
+      "cmp.vs": "{a} vs {b}",
+      "goal.empty": "No goals yet. Create one like \"New phone\" or \"Holiday\" and add money bit by bit.", "goal.create": "Create a goal",
+      "goal.progress": "{saved} of {target}", "goal.eta": "Expected by {month} at {amt}/month", "goal.done": "Goal reached",
+      "goal.noEta": "Set a Savings allocation to estimate a date",
+      "goal.new": "New goal", "goal.name": "Goal name", "goal.namePh": "New phone, holiday, bike…", "goal.amount": "Target amount (Rp)",
+      "goal.depositLbl": "Add money", "goal.deposit": "Add", "goal.quick": "Savings share · {amt}", "goal.history": "Deposits",
+      "goal.noDeposits": "No deposits yet.", "goal.delete": "Delete goal", "goal.fromMonth": "Left over from {month}", "goal.manual": "Deposit",
+      "goal.savedTotal": "Total saved since {month}",
+      "pick.title": "Put into a goal", "pick.text": "{amt} left over from {month} will be added as a deposit.",
+      "err.goalName": "Enter a goal name.", "err.goalAmt": "Enter the target amount.", "err.amt": "Enter an amount first, e.g. 25,000.",
+      "err.date": "Pick the expense date.", "err.cat": "Pick a category.", "err.locked": "{month} is closed. Pick a date from {date}.",
+      "toast.ready": "All set! Add your first expense with the + button", "toast.added": "Added {amt} · {cat}", "toast.txDeleted": "Expense deleted",
+      "toast.income": "Total money updated", "toast.preset": "{name} style applied", "toast.catDeleted": "{name} deleted", "toast.catAdded": "{name} added. Set its percentage.",
+      "toast.backup": "Backup created", "toast.restored": "Data restored", "toast.badFile": "That file is not an Atur Uang backup.",
+      "toast.saveFail": "Couldn't save. Your phone storage may be full.", "toast.needCat": "Add at least one category in Budget first.",
+      "toast.goalSaved": "Goal {name} created", "toast.deposit": "{amt} added to {name}", "toast.goalDeleted": "Goal deleted", "toast.depDeleted": "Deposit deleted",
+      "toast.locked": "This month is closed", "toast.lang": "Language: English",
+      "budget.presetLbl": "Split style", "custom": "Custom", "budget.customDesc": "You set the percentages yourself. Tap a style above to go back to a recommendation.",
+      "budget.total100": "Total 100% · every rupiah has a job", "budget.totalOff": "Total {t}% · {what}", "budget.excess": "{n}% over", "budget.remain": "{n}% unassigned", "budget.fix": "Fix",
+      "budget.addPh": "New category, e.g. Bike loan", "budget.add": "Add",
+      "budget.locked": "{month} is closed. Its budget is kept as it was and can't be changed.",
+      "budget.pastGrace": "The {month} budget is saved and can't be changed. Its expenses can still be added until {date}.",
+      "row.used": "Spent {amt}", "row.over": "Over by {amt}", "row.setAside": "Set aside {amt}", "row.left": "{amt} left", "row.perDay": "{amt}/day",
+      "group.kebutuhan": "Needs", "group.keinginan": "Wants", "group.tabungan": "Savings", "group.other": "Other",
+      "preset.seimbang": "Balanced", "preset.hemat": "Frugal", "preset.mahasiswa": "Starter",
+      "pdesc.seimbang": "The 50/30/20 rule: half for needs, 30% for wants, 20% saved.",
+      "pdesc.hemat": "Wants cut to 20% so 30% can be saved. Good when you're chasing a goal.",
+      "pdesc.mahasiswa": "For an allowance or a first salary: more for food and transport, still saving 15%.",
+      "cat.makan": "Food & Drinks", "cat.tagihan": "Housing & Bills", "cat.transport": "Transport", "cat.hiburan": "Fun & Snacks",
+      "cat.belanja": "Personal Shopping", "cat.sosial": "Giving & Social", "cat.darurat": "Emergency Fund", "cat.tabungan": "Savings & Investing",
+      "sub.makan": "Groceries, eating out, coffee, water", "sub.tagihan": "Rent, electricity, water, internet, phone", "sub.transport": "Fuel, ride-hailing, train, parking, tolls",
+      "sub.hiburan": "Hanging out, movies, streaming", "sub.belanja": "Clothes, skincare, hobbies, online orders", "sub.sosial": "Zakat, weddings, gifts, family",
+      "sub.darurat": "Medicine, doctor, sudden repairs", "sub.tabungan": "Set aside at the start of the month",
+      "add.date": "Date", "add.note": "Note", "add.notePh": "Lunch, fuel…", "add.amountAria": "Expense amount", "add.left": "{amt} left",
+      "inc.title": "Monthly money", "inc.desc": "Salary, allowance, or total income after deductions. Applies to this month onward; past months stay as they were.",
+      "hist.searchPh": "Search notes, categories or amounts", "hist.allMonths": "All months", "hist.total": "Total {month}", "hist.results": "Search results",
+      "hist.count": "{n} entries", "hist.empty": "No expenses in {month} yet.", "hist.noMatch": "No matching expenses.",
+      "recent.empty": "No expenses in {month} yet. Tap + to add one.",
+      "tx.deletedCat": "Deleted category", "tx.locked": "Locked",
+      "more.language": "Language", "more.data": "Your data", "more.storage": "Storage", "more.lastSaved": "Last saved", "more.lastBackup": "Last backup",
+      "more.never": "Never. Once a month is recommended.", "more.savedTotal": "Total saved", "more.savedSince": "Since {month}, from closed months",
+      "more.savedNone": "Shows up once your first month closes",
+      "store.ok2": "Saved automatically on this iPhone (2 copies)", "store.ok1": "Saved automatically on this device", "store.fail": "Couldn't save. Make a backup now.",
+      "badge.perm": "Persistent", "badge.active": "Active", "badge.problem": "Problem",
+      "more.export": "Create backup (export)", "more.import": "Restore from backup",
+      "more.backupNote": "A backup is a .json file. Save it to Files, iCloud Drive, or send it to yourself. Use it when you switch phones too.",
+      "more.install": "Install on iPhone",
+      "more.steps": "<li>Open this app in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (square with an up arrow).</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li><li>Open <b>Atur Uang</b> from your home screen. It works offline.</li>",
+      "more.other": "Other", "more.reset": "Delete all data", "more.resetSub": "Start over. This can't be undone.",
+      "more.version": "Atur Uang · version 1.1 · your data never leaves this device",
+      "cf.restoreTitle": "Restore backup?", "cf.restoreText": "Your current data will be replaced with the backup from {date} ({n} expenses).", "cf.restoreOk": "Replace with backup",
+      "cf.resetTitle": "Delete all data?", "cf.resetText": "All settings, expenses and goals on this phone will be deleted. Make a backup first if you still need them.", "cf.resetOk": "Delete everything",
+      "cf.goalTitle": "Delete goal?", "cf.goalText": "Goal {name} and all its deposits will be deleted.",
+      "tip.noIncome": "Set this month's total by tapping \"Total money\" on the card above.",
+      "tip.pct": "Your percentages add up to {t}%. Adjust them in Budget so they total 100%.",
+      "tip.over": "{cat} is over by {amt}. Cover it from your wants, not your savings.",
+      "tip.near": "{cat} is at {p}%. {amt} left for {n} days, about {day} a day.",
+      "tip.food": "Your food budget is about {day} a day, or {meal} per meal.",
+      "tip.save": "Move {amt} to your savings account as soon as you get paid. Out of sight, out of spending.",
+      "tip.starter": "With under Rp 3 million a month, the Starter style is usually more realistic for food and transport.",
+      "tip.backup": "It's been over 30 days since your last backup. Make one in More so your data is safe if you change phones.",
+      "tip.rise": "{cat} is up {p}% vs {prev} ({amt} more). Try easing off a little.",
+      "backup.file": "atur-uang-backup", "backup.title": "Atur Uang backup",
+    },
+  };
+  function detectLang() {
+    try { const s = localStorage.getItem("aturuang:lang"); if (s === "id" || s === "en") return s; } catch {}
+    const langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "id"];
+    return langs.some(l => /^(id|in|ms)\b/i.test(l)) ? "id" : "en";
+  }
+  let lang = detectLang();
+  const loc = () => lang === "en" ? "en-GB" : "id-ID";
+  function t(key, vars) {
+    const s = (I18N[lang] && I18N[lang][key]) ?? I18N.id[key] ?? key;
+    return vars ? s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "") : s;
+  }
+  function applyStatic() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    document.querySelectorAll("[data-i18n-aria]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+  }
+
   // ================= data model =================
   const BASE = [
-    { id: "makan",     name: "Makan & Minum",       sub: "Dapur, makan di luar, kopi, galon",  group: "kebutuhan" },
-    { id: "tagihan",   name: "Tempat Tinggal",      sub: "Kos/sewa, listrik, air, internet, pulsa", group: "kebutuhan" },
-    { id: "transport", name: "Transportasi",        sub: "Bensin, ojol, KRL, parkir, tol",     group: "kebutuhan" },
-    { id: "hiburan",   name: "Hiburan & Jajan",     sub: "Nongkrong, nonton, streaming",       group: "keinginan" },
-    { id: "belanja",   name: "Belanja Pribadi",     sub: "Pakaian, skincare, hobi, checkout",  group: "keinginan" },
-    { id: "sosial",    name: "Sedekah & Sosial",    sub: "Zakat, kondangan, kado, keluarga",   group: "keinginan" },
-    { id: "darurat",   name: "Dana Darurat",        sub: "Obat, berobat, perbaikan mendadak",  group: "tabungan" },
-    { id: "tabungan",  name: "Tabungan & Investasi",sub: "Sisihkan di awal bulan",             group: "tabungan" },
+    { id: "makan", group: "kebutuhan" }, { id: "tagihan", group: "kebutuhan" }, { id: "transport", group: "kebutuhan" },
+    { id: "hiburan", group: "keinginan" }, { id: "belanja", group: "keinginan" }, { id: "sosial", group: "keinginan" },
+    { id: "darurat", group: "tabungan" }, { id: "tabungan", group: "tabungan" },
   ];
+  const BASE_IDS = new Set(BASE.map(b => b.id));
   const PRESETS = {
-    seimbang:  { label: "Seimbang", target: [50, 30, 20], desc: "Pola 50/30/20: separuh untuk kebutuhan, 30% keinginan, 20% ditabung.",
-                 p: { makan: 25, tagihan: 15, transport: 10, hiburan: 12, belanja: 13, sosial: 5, darurat: 5, tabungan: 15 } },
-    hemat:     { label: "Hemat", target: [50, 20, 30], desc: "Keinginan dipangkas jadi 20% supaya 30% bisa ditabung. Cocok saat mengejar target.",
-                 p: { makan: 25, tagihan: 15, transport: 10, hiburan: 8, belanja: 8, sosial: 4, darurat: 10, tabungan: 20 } },
-    mahasiswa: { label: "Pemula", target: [60, 25, 15], desc: "Untuk uang saku atau gaji pertama: porsi makan dan transport lebih besar, tetap menabung 15%.",
-                 p: { makan: 35, tagihan: 10, transport: 15, hiburan: 10, belanja: 10, sosial: 5, darurat: 5, tabungan: 10 } },
+    seimbang:  { target: [50, 30, 20], p: { makan: 25, tagihan: 15, transport: 10, hiburan: 12, belanja: 13, sosial: 5, darurat: 5, tabungan: 15 } },
+    hemat:     { target: [50, 20, 30], p: { makan: 25, tagihan: 15, transport: 10, hiburan: 8, belanja: 8, sosial: 4, darurat: 10, tabungan: 20 } },
+    mahasiswa: { target: [60, 25, 15], p: { makan: 35, tagihan: 10, transport: 15, hiburan: 10, belanja: 10, sosial: 5, darurat: 5, tabungan: 10 } },
   };
-  const GROUPS = { kebutuhan: "Kebutuhan", keinginan: "Keinginan", tabungan: "Tabungan" };
+  const GROUP_KEYS = ["kebutuhan", "keinginan", "tabungan"];
   const GROUP_COLOR = { kebutuhan: "var(--c-tagihan)", keinginan: "var(--c-hiburan)", tabungan: "var(--c-tabungan)" };
   const EXTRA_COLORS = ["--c-x1", "--c-x2", "--c-x3", "--c-x4"];
   const ICONS = {
@@ -499,41 +804,107 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     sosial: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
     darurat: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M12 9v6M9 12h6"/>',
     tabungan: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+    goal: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
     x: '<path d="M3 12l9-9h8v8l-9 9z"/><circle cx="15.5" cy="8.5" r="1.2"/>',
   };
-  const icon = c => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[c.id] || ICONS.x}</svg>`;
+  const svgI = inner => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+  const icon = c => svgI(ICONS[c.id] || ICONS.x);
   const colorOf = c => c.color ? `var(${c.color})` : `var(--c-${c.id})`;
+  const catName = c => BASE_IDS.has(c.id) ? t("cat." + c.id) : c.name;
+  const catSub = c => BASE_IDS.has(c.id) ? t("sub." + c.id) : (c.sub || "");
+  const LOCK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
   // ================= helpers =================
   const $ = id => document.getElementById(id);
-  const rp = n => (n < 0 ? "-Rp " : "Rp ") + Math.abs(Math.round(n)).toLocaleString("id-ID");
-  const rpShort = n => {
+  const rp = n => (n < 0 ? "-Rp " : "Rp ") + Math.abs(Math.round(n)).toLocaleString(loc());
+  function rpShort(n) {
     const a = Math.abs(n), s = n < 0 ? "-" : "";
-    if (a >= 1e9) return s + (a / 1e9).toFixed(1).replace(/\.0$/, "").replace(".", ",") + " M";
-    if (a >= 1e6) return s + (a / 1e6).toFixed(1).replace(/\.0$/, "").replace(".", ",") + " jt";
-    if (a >= 1e3) return s + Math.round(a / 1e3) + " rb";
+    const u = lang === "en" ? ["B", "M", "k"] : ["M", "jt", "rb"];
+    const dec = x => { let v = x.toFixed(1).replace(/\.0$/, ""); return lang === "en" ? v : v.replace(".", ","); };
+    const sp = lang === "en" ? "" : " ";
+    if (a >= 1e9) return s + dec(a / 1e9) + sp + u[0];
+    if (a >= 1e6) return s + dec(a / 1e6) + sp + u[1];
+    if (a >= 1e3) return s + Math.round(a / 1e3) + sp + u[2];
     return s + Math.round(a);
-  };
+  }
   const digits = s => Math.min(parseInt(String(s).replace(/\D/g, ""), 10) || 0, 999999999999);
-  const grouped = n => n ? n.toLocaleString("id-ID") : "";
+  const grouped = n => n ? n.toLocaleString(loc()) : "";
   const clone = o => JSON.parse(JSON.stringify(o));
   const pad = n => String(n).padStart(2, "0");
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-  const now = () => new Date();
+  const sum = arr => arr.reduce((a, b) => a + b, 0);
+
+  // "Today" can be overridden with ?today=YYYY-MM-DD for testing the month lock.
+  const TEST_TODAY = (() => { const v = new URLSearchParams(location.search).get("today"); return /^\d{4}-\d{2}-\d{2}$/.test(v || "") ? v : null; })();
+  function now() {
+    const n = new Date();
+    if (!TEST_TODAY) return n;
+    const [y, m, d] = TEST_TODAY.split("-").map(Number);
+    return new Date(y, m - 1, d, n.getHours(), n.getMinutes(), n.getSeconds());
+  }
   const ymOf = d => d.getFullYear() + "-" + pad(d.getMonth() + 1);
   const isoOf = d => `${ymOf(d)}-${pad(d.getDate())}`;
+  const curYm = () => ymOf(now());
   const dimOf = ym => { const [y, m] = ym.split("-").map(Number); return new Date(y, m, 0).getDate(); };
   const shiftYm = (ym, k) => { const [y, m] = ym.split("-").map(Number); return ymOf(new Date(y, m - 1 + k, 1)); };
-  const monthName = (ym, opt = { month: "long", year: "numeric" }) => { const [y, m] = ym.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleDateString("id-ID", opt); };
-  const fmtWhen = t => t ? new Date(t).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "–";
+  const monthName = (ym, opt = { month: "long", year: "numeric" }) => { const [y, m] = ym.split("-").map(Number); return new Date(y, m - 1, 1).toLocaleDateString(loc(), opt); };
+  const monthShort = ym => monthName(ym, { month: "short", year: "numeric" });
+  const fmtWhen = ts => ts ? new Date(ts).toLocaleString(loc(), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "–";
 
-  const defaultCats = key => BASE.map(b => ({ ...b, pct: PRESETS[key].p[b.id] }));
-  const freshData = (income, preset) => ({ v: 1, settings: { income, preset, cats: defaultCats(preset) }, tx: {}, meta: { created: Date.now(), lastBackup: 0 }, _t: 0 });
+  // ================= month lock =================
+  // A month stays open for GRACE_DAYS days into the next month, then it is closed for good.
+  const GRACE_DAYS = 3;
+  function isLocked(ym) {
+    const cur = curYm();
+    if (ym >= cur) return false;
+    if (shiftYm(ym, 1) < cur) return true;
+    return now().getDate() > GRACE_DAYS;
+  }
+  const inGrace = ym => ym < curYm() && !isLocked(ym);
+  const canEditBudget = ym => ym >= curYm();
+  const graceEndText = ym => { const [y, m] = shiftYm(ym, 1).split("-").map(Number); return new Date(y, m - 1, GRACE_DAYS).toLocaleDateString(loc(), { day: "numeric", month: "long" }); };
+  function earliestOpenDate() {
+    const cur = curYm(), prev = shiftYm(cur, -1);
+    return isLocked(prev) ? `${cur}-01` : `${prev}-01`;
+  }
 
+  // ================= data =================
+  const defaultCats = key => BASE.map(b => ({ id: b.id, group: b.group, pct: PRESETS[key].p[b.id] }));
+  const freshData = (income, preset) => ({
+    v: 2, lang, settings: { income, preset, cats: defaultCats(preset) }, months: {}, tx: {}, goals: [],
+    meta: { created: now().getTime(), lastBackup: 0 }, _t: 0,
+  });
   function valid(d) {
     return d && typeof d === "object" && d.settings && Array.isArray(d.settings.cats) && typeof d.settings.income === "number" && d.tx && typeof d.tx === "object";
   }
+  // v1 → v2: add per-month budget copies, goals and language. Months that already have
+  // expenses get a copy of today's settings so later edits don't rewrite them.
+  function migrate(d) {
+    d.months = d.months && typeof d.months === "object" ? d.months : {};
+    d.goals = Array.isArray(d.goals) ? d.goals : [];
+    d.goals.forEach(g => { g.deposits = Array.isArray(g.deposits) ? g.deposits : []; });
+    d.meta = d.meta || { created: now().getTime(), lastBackup: 0 };
+    if (!d.lang) d.lang = d.v >= 2 ? lang : "id";
+    for (const k of Object.keys(d.tx)) if (!Array.isArray(d.tx[k])) delete d.tx[k];
+    d.v = 2;
+    return d;
+  }
+  const snapshotOf = s => clone({ income: s.income, preset: s.preset, cats: s.cats });
+  function ensureSnapshots() {
+    if (!D) return false;
+    const cur = curYm();
+    let start = D.meta.created ? ymOf(new Date(D.meta.created)) : cur;
+    for (const k of Object.keys(D.tx)) if (D.tx[k].length && k < start) start = k;
+    let ym = start, changed = false, guard = 0;
+    while (ym < cur && guard++ < 240) {
+      if (!D.months[ym]) { D.months[ym] = snapshotOf(D.settings); changed = true; }
+      ym = shiftYm(ym, 1);
+    }
+    if (changed) save();
+    return changed;
+  }
+  const budgetFor = ym => (D.months && D.months[ym]) || D.settings;
 
   // ================= storage: IndexedDB + localStorage mirror =================
   // Every change is written to both. localStorage is synchronous, so a write made the moment
@@ -573,7 +944,7 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     try { localStorage.setItem(LS_KEY, JSON.stringify(D)); okLS = true; } catch { okLS = false; }
     idbPut(clone(D)).then(() => { okIDB = true; }, () => { okIDB = false; }).finally(renderStoreInfo);
     dirty = false;
-    if (!okLS && !idb) toast("Gagal menyimpan. Penyimpanan HP mungkin penuh.");
+    if (!okLS && !idb) toast(t("toast.saveFail"));
   }
   function save() { dirty = true; clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 250); askPersist(); }
   const flushIfDirty = () => { if (dirty) saveNow(); };
@@ -595,55 +966,75 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     return cands[0] || null;
   }
 
-  // ================= view state =================
-  const TODAY = now();
-  let view = ymOf(TODAY), tab = "home";
+  // ================= view state & derived numbers =================
+  let view = curYm(), tab = "home";
 
   const monthTx = (ym = view) => D.tx[ym] || [];
-  const sumPct = () => D.settings.cats.reduce((a, c) => a + (c.pct || 0), 0);
-  const allocOf = c => Math.round(D.settings.income * (c.pct || 0) / 100 / 1000) * 1000;
-  const spentBy = () => { const m = {}; for (const t of monthTx()) m[t.cat] = (m[t.cat] || 0) + t.amt; return m; };
+  const sumPct = (b = budgetFor(view)) => sum(b.cats.map(c => c.pct || 0));
+  const allocOf = (c, b = budgetFor(view)) => Math.round(b.income * (c.pct || 0) / 100 / 1000) * 1000;
+  const spentBy = (ym = view) => { const m = {}; for (const x of monthTx(ym)) m[x.cat] = (m[x.cat] || 0) + x.amt; return m; };
   function daysLeft() {
-    const cur = ymOf(now());
+    const cur = curYm();
     if (view === cur) return dimOf(view) - now().getDate() + 1;
     return view < cur ? 0 : dimOf(view);
   }
-  const findCat = id => D.settings.cats.find(c => c.id === id);
+  function findCat(id, ym = view) {
+    return budgetFor(ym).cats.find(c => c.id === id) || D.settings.cats.find(c => c.id === id)
+      || Object.values(D.months).map(m => m.cats.find(c => c.id === id)).find(Boolean) || null;
+  }
+  // Money kept from a finished month: total minus spending, where anything logged under a
+  // savings-type category counts as kept, not spent.
+  function savedOf(ym) {
+    const b = budgetFor(ym);
+    const spent = sum(monthTx(ym).filter(x => { const c = b.cats.find(k => k.id === x.cat); return !(c && c.group === "tabungan"); }).map(x => x.amt));
+    return b.income - spent;
+  }
+  function totalSaved() {
+    const months = Object.keys(D.tx).filter(ym => D.tx[ym].length && isLocked(ym)).sort();
+    return { amt: sum(months.map(savedOf)), first: months[0] || null };
+  }
+  const goalSaved = g => sum(g.deposits.map(d => d.amt));
+  function depositFrom(ym) {
+    for (const g of D.goals) { const d = g.deposits.find(x => x.fromYm === ym); if (d) return { g, d }; }
+    return null;
+  }
+  function savingsShare() {
+    const c = D.settings.cats.find(k => k.id === "tabungan");
+    return c ? allocOf(c, D.settings) : 0;
+  }
+  const windowSum = (ym, maxDay, catId) => sum(monthTx(ym).filter(x => (!maxDay || +x.date.slice(8) <= maxDay) && (!catId || x.cat === catId)).map(x => x.amt));
 
-  // ================= toast =================
+  // ================= toast / armable =================
   let toastT;
   function toast(msg) {
-    const t = $("toast"); t.textContent = msg; t.classList.add("show");
-    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200);
+    const el = $("toast"); el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 2200);
   }
-
   // Two-step destructive button: first tap arms, second tap within 3 s acts.
   function armable(btn, armText, act) {
-    const orig = btn.innerHTML; let t;
+    const orig = btn.innerHTML; let tm;
     btn.addEventListener("click", e => {
       e.stopPropagation();
-      if (btn.classList.contains("arm")) { clearTimeout(t); act(); return; }
+      if (btn.classList.contains("arm")) { clearTimeout(tm); act(); return; }
       btn.classList.add("arm"); btn.textContent = armText;
-      t = setTimeout(() => { btn.classList.remove("arm"); btn.innerHTML = orig; }, 3000);
+      tm = setTimeout(() => { btn.classList.remove("arm"); btn.innerHTML = orig; }, 3000);
     });
   }
 
   // ================= banknote guilloché =================
   function drawGuilloche() {
     const svg = $("guil"); let out = "";
-    const rose = (cx, cy, R, r, p, scale, turns) => {
+    const rose = (cx, cy, R, r, p, scale) => {
       let d = "";
-      for (let i = 0; i <= 720 * turns; i++) {
-        const t = i / 720 * Math.PI * 2;
-        const x = cx + scale * ((R + r) * Math.cos(t) - p * Math.cos((R + r) / r * t));
-        const y = cy + scale * ((R + r) * Math.sin(t) - p * Math.sin((R + r) / r * t));
+      for (let i = 0; i <= 720; i++) {
+        const a = i / 720 * Math.PI * 2;
+        const x = cx + scale * ((R + r) * Math.cos(a) - p * Math.cos((R + r) / r * a));
+        const y = cy + scale * ((R + r) * Math.sin(a) - p * Math.sin((R + r) / r * a));
         d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
       }
       return `<path d="${d}" fill="none" stroke="#fff" stroke-width=".6"/>`;
     };
-    out += rose(330, 70, 40, 5, 9, 1.55, 1);
-    out += rose(330, 70, 40, 5, 4, 1.15, 1);
-    out += rose(330, 70, 30, 3, 6, 0.9, 1);
+    out += rose(330, 70, 40, 5, 9, 1.55) + rose(330, 70, 40, 5, 4, 1.15) + rose(330, 70, 30, 3, 6, 0.9);
     for (let k = 0; k < 9; k++) {
       let d = "";
       for (let x = -10; x <= 410; x += 4) {
@@ -655,37 +1046,56 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     svg.innerHTML = out;
   }
 
+  // ================= language =================
+  function renderLangSegs() {
+    const html = ["id", "en"].map(l => `<button type="button" role="radio" data-l="${l}" aria-checked="${l === lang}">${l === "id" ? "Indonesia" : "English"}</button>`).join("");
+    $("langSeg").innerHTML = html;
+    $("obLang").innerHTML = ["id", "en"].map(l => `<button type="button" role="radio" data-l="${l}" aria-checked="${l === lang}">${l.toUpperCase()}</button>`).join("");
+  }
+  function setLang(l) {
+    if (l !== "id" && l !== "en") return;
+    lang = l;
+    try { localStorage.setItem("aturuang:lang", l); } catch {}
+    if (D) { D.lang = l; save(); }
+    applyStatic(); renderLangSegs();
+    if (D) { greet(); go(tab); renderAll(); } else renderOnboard();
+  }
+  $("langSeg").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if (b && b.dataset.l !== lang) { setLang(b.dataset.l); toast(t("toast.lang")); } });
+  $("obLang").addEventListener("click", e => { const b = e.target.closest("[data-l]"); if (b) setLang(b.dataset.l); });
+
   // ================= onboarding =================
   let obPreset = "seimbang";
   function renderOnboard() {
-    $("obPresets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button type="button" role="radio" data-p="${k}" aria-checked="${k === obPreset}">${p.label}</button>`).join("");
-    $("obDesc").textContent = PRESETS[obPreset].desc;
+    $("obPresets").innerHTML = Object.keys(PRESETS).map(k => `<button type="button" role="radio" data-p="${k}" aria-checked="${k === obPreset}">${t("preset." + k)}</button>`).join("");
+    $("obDesc").textContent = t("pdesc." + obPreset);
     const inc = digits($("obIncome").value);
+    $("obIncome").value = grouped(inc);
     $("obPreview").innerHTML = BASE.map(b => {
-      const amt = Math.round(inc * PRESETS[obPreset].p[b.id] / 100 / 1000) * 1000;
-      return `<div class="mini" style="--k:var(--c-${b.id})"><span class="ico">${icon(b)}</span><div><span>${esc(b.name)} · ${PRESETS[obPreset].p[b.id]}%</span><b>${inc ? rp(amt) : "–"}</b></div></div>`;
+      const p = PRESETS[obPreset].p[b.id];
+      const amt = Math.round(inc * p / 100 / 1000) * 1000;
+      return `<div class="mini" style="--k:var(--c-${b.id})"><span class="ico">${icon(b)}</span><div><span>${esc(catName(b))} · ${p}%</span><b>${inc ? rp(amt) : "–"}</b></div></div>`;
     }).join("");
   }
-  $("obIncome").addEventListener("input", e => { e.target.value = grouped(digits(e.target.value)); renderOnboard(); });
+  $("obIncome").addEventListener("input", renderOnboard);
   $("obPresets").addEventListener("click", e => { const b = e.target.closest("[data-p]"); if (b) { obPreset = b.dataset.p; renderOnboard(); } });
   $("obStart").addEventListener("click", () => {
     const inc = digits($("obIncome").value);
-    if (!inc) { $("obErr").textContent = "Isi dulu jumlah uangmu per bulan, misalnya 3.000.000."; $("obIncome").focus(); return; }
+    if (!inc) { $("obErr").textContent = t("ob.err"); $("obIncome").focus(); return; }
     D = freshData(inc, obPreset);
     saveNow(); askPersist();
     showApp();
-    toast("Siap! Catat pengeluaran pertamamu dengan tombol +");
+    toast(t("toast.ready"));
   });
 
   // ================= tabs & navigation =================
-  const TITLES = { home: "Beranda", budget: "Anggaran", history: "Riwayat", more: "Lainnya" };
-  function go(t) {
-    tab = t;
-    for (const k of Object.keys(TITLES)) $("v-" + k).hidden = k !== t;
+  const TABS = ["home", "budget", "history", "more"];
+  function go(tb) {
+    tab = tb;
+    for (const k of TABS) $("v-" + k).hidden = k !== tb;
     document.querySelectorAll(".tab").forEach(b => {
-      if (b.dataset.tab === t) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+      if (b.dataset.tab === tb) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
     });
-    $("title").textContent = TITLES[t];
+    $("title").textContent = t("tab." + tb);
     window.scrollTo(0, 0);
   }
   document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => go(b.dataset.tab)));
@@ -709,12 +1119,12 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     openSheet = null;
     const done = () => { if (!s.classList.contains("open")) { s.hidden = true; if (!openSheet) sc.hidden = true; } };
     instant ? done() : setTimeout(done, 280);
-    document.activeElement && document.activeElement.blur && document.activeElement.blur();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   }
   $("scrim").addEventListener("click", () => closeSheet());
   document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => closeSheet()));
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
-  // drag the sheet down to close
+  // drag the sheet down by its top to close
   document.querySelectorAll(".sheet").forEach(s => {
     let y0 = null, dy = 0;
     s.addEventListener("touchstart", e => { if (s.scrollTop <= 0 && e.target.closest(".grab, .sheet-head, h2")) { y0 = e.touches[0].clientY; dy = 0; s.style.transition = "none"; } }, { passive: true });
@@ -727,259 +1137,539 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
     $("cfTitle").textContent = title; $("cfText").textContent = text; $("cfOk").textContent = okText;
     confirmAct = act; sheet("sh-confirm");
   }
-  $("cfOk").addEventListener("click", () => { const a = confirmAct; confirmAct = null; closeSheet(); a && a(); });
+  $("cfOk").addEventListener("click", () => { const a = confirmAct; confirmAct = null; closeSheet(); if (a) a(); });
 
-  // ---- add expense sheet ----
+  // ================= expenses: add / delete (lock-guarded) =================
+  function addTx(entry) {
+    const ym = entry.date.slice(0, 7);
+    if (isLocked(ym)) { toast(t("toast.locked")); return false; }
+    (D.tx[ym] = D.tx[ym] || []).push(entry);
+    save(); return true;
+  }
+  function deleteTx(entry) {
+    const ym = entry.date.slice(0, 7);
+    if (isLocked(ym)) { toast(t("toast.locked")); return; }
+    D.tx[ym] = (D.tx[ym] || []).filter(x => x !== entry);
+    save(); renderAll(); toast(t("toast.txDeleted"));
+  }
+
   let addCat = null;
+  const addYm = () => ($("addDate").value || isoOf(now())).slice(0, 7);
   function openAdd() {
-    if (!D.settings.cats.length) { toast("Tambahkan minimal satu kelompok dulu di Anggaran."); go("budget"); return; }
-    if (!findCat(addCat)) addCat = D.settings.cats[0].id;
+    if (!D.settings.cats.length) { toast(t("toast.needCat")); go("budget"); return; }
+    const cur = curYm(), open = earliestOpenDate();
     $("addAmt").value = ""; $("addNote").value = ""; $("addErr").textContent = "";
-    const cur = ymOf(now());
-    $("addDate").value = view === cur ? isoOf(now()) : `${view}-01`;
+    $("addDate").min = open;
+    // default date: today, or the end of an earlier month that is still open, or the 1st of a future month
+    $("addDate").value = view === cur || isLocked(view) || view < open.slice(0, 7) ? isoOf(now())
+      : view < cur ? `${view}-${pad(dimOf(view))}` : `${view}-01`;
     renderAddCats();
     $("quickAmt").innerHTML = [10000, 20000, 50000, 100000].map(v => `<button type="button" data-v="${v}">${rpShort(v)}</button>`).join("");
     sheet("sh-add");
     setTimeout(() => $("addAmt").focus(), 320);
   }
   function renderAddCats() {
-    const spent = spentBy();
-    $("addCats").innerHTML = D.settings.cats.map(c => {
-      const left = allocOf(c) - (spent[c.id] || 0);
-      return `<button type="button" class="chip" role="radio" data-c="${esc(c.id)}" aria-checked="${c.id === addCat}" style="--k:${colorOf(c)}"><span class="ico">${icon(c)}</span>${esc(c.name)}<small>sisa ${rpShort(left)}</small></button>`;
+    const ym = addYm(), b = budgetFor(ym), spent = spentBy(ym);
+    if (!b.cats.some(c => c.id === addCat)) addCat = b.cats[0] && b.cats[0].id;
+    $("addCats").innerHTML = b.cats.map(c => {
+      const left = allocOf(c, b) - (spent[c.id] || 0);
+      return `<button type="button" class="chip" role="radio" data-c="${esc(c.id)}" aria-checked="${c.id === addCat}" style="--k:${colorOf(c)}"><span class="ico">${icon(c)}</span>${esc(catName(c))}<small>${esc(t("add.left", { amt: rpShort(left) }))}</small></button>`;
     }).join("");
   }
+  $("addDate").addEventListener("change", renderAddCats);
   $("addCats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { addCat = b.dataset.c; renderAddCats(); } });
   $("quickAmt").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) $("addAmt").value = grouped(digits($("addAmt").value) + +b.dataset.v); });
   $("addAmt").addEventListener("input", e => { e.target.value = grouped(digits(e.target.value)); });
   $("addForm").addEventListener("submit", e => {
     e.preventDefault();
-    const amt = digits($("addAmt").value), date = $("addDate").value, c = findCat(addCat);
-    if (!amt) { $("addErr").textContent = "Isi jumlahnya dulu, misalnya 25.000."; $("addAmt").focus(); return; }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { $("addErr").textContent = "Pilih tanggal pengeluaran."; return; }
-    if (!c) { $("addErr").textContent = "Pilih kelompoknya."; return; }
+    const amt = digits($("addAmt").value), date = $("addDate").value;
+    const err = $("addErr");
+    if (!amt) { err.textContent = t("err.amt"); $("addAmt").focus(); return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { err.textContent = t("err.date"); return; }
     const ym = date.slice(0, 7);
-    (D.tx[ym] = D.tx[ym] || []).push({ id: uid(), date, cat: c.id, amt, note: $("addNote").value.trim(), t: Date.now() });
-    save(); closeSheet();
-    if (ym !== view) view = ym;
+    if (isLocked(ym) || date < earliestOpenDate()) {
+      const open = earliestOpenDate(), [y, m, d] = open.split("-").map(Number);
+      err.textContent = t("err.locked", { month: monthName(ym), date: new Date(y, m - 1, d).toLocaleDateString(loc(), { day: "numeric", month: "long" }) });
+      return;
+    }
+    const c = budgetFor(ym).cats.find(k => k.id === addCat);
+    if (!c) { err.textContent = t("err.cat"); return; }
+    if (!addTx({ id: uid(), date, cat: c.id, amt, note: $("addNote").value.trim(), t: Date.now() })) return;
+    closeSheet();
+    view = ym;
     renderAll();
-    toast(`Tercatat ${rp(amt)} · ${c.name}`);
+    toast(t("toast.added", { amt: rp(amt), cat: catName(c) }));
   });
   $("fab").addEventListener("click", openAdd);
 
   // ---- income sheet ----
-  $("editIncome").addEventListener("click", () => { $("incAmt").value = grouped(D.settings.income); sheet("sh-income"); setTimeout(() => $("incAmt").focus(), 320); });
+  $("editIncome").addEventListener("click", () => {
+    if (!canEditBudget(view)) { toast(t("toast.locked")); return; }
+    $("incAmt").value = grouped(D.settings.income); sheet("sh-income"); setTimeout(() => $("incAmt").focus(), 320);
+  });
   $("incAmt").addEventListener("input", e => { e.target.value = grouped(digits(e.target.value)); });
   $("incForm").addEventListener("submit", e => {
     e.preventDefault();
+    if (!canEditBudget(view)) return;
     D.settings.income = digits($("incAmt").value);
-    save(); closeSheet(); renderAll(); toast("Total uang diperbarui");
+    save(); closeSheet(); renderAll(); toast(t("toast.income"));
   });
 
   // ================= render: home =================
-  function renderHome() {
-    const st = D.settings, spent = spentBy(), dl = daysLeft();
-    const total = Object.values(spent).reduce((a, b) => a + b, 0);
-    const left = st.income - total;
-    $("note").classList.toggle("neg", left < 0);
-    $("hLeft").innerHTML = `<small>${left < 0 ? "-Rp" : "Rp"}</small>${Math.abs(left).toLocaleString("id-ID")}`;
-    $("hIncome").textContent = rp(st.income);
-    $("hSpent").textContent = rp(total);
-    $("hMeter").style.width = (st.income ? Math.min(100, total / st.income * 100) : 0) + "%";
-    $("serial").textContent = "AU " + view.replace("-", "") + " · " + monthName(view, { month: "short" }).toUpperCase();
-    const flex = st.cats.filter(c => c.group !== "tabungan" && c.id !== "tagihan").reduce((a, c) => a + Math.max(0, allocOf(c) - (spent[c.id] || 0)), 0);
-    $("hDailyLbl").textContent = dl > 0 ? (view === ymOf(now()) ? `Aman dipakai hari ini · ${dl} hari lagi` : `Rata-rata per hari · ${dl} hari`) : "Bulan ini sudah lewat";
-    $("hDaily").textContent = dl > 0 ? rp(flex / dl) : "–";
-
-    const tp = Math.max(100, sumPct());
-    $("homeStrip").innerHTML = st.cats.filter(c => c.pct).map(c => `<i style="--k:${colorOf(c)};width:${c.pct / tp * 100}%"></i>`).join("");
-    $("homeMini").innerHTML = st.cats.map(c => {
-      const a = allocOf(c), s = spent[c.id] || 0;
-      return `<div class="mini${s > a ? " over" : ""}" style="--k:${colorOf(c)}"><span class="ico">${icon(c)}</span><div><span>${esc(c.name)}</span><b>${rp(a - s)}</b></div></div>`;
-    }).join("");
-
-    renderTips(spent, dl);
-
-    const items = [...monthTx()].sort((a, b) => b.date.localeCompare(a.date) || (b.t || 0) - (a.t || 0)).slice(0, 5);
-    const ul = $("recent");
-    if (!items.length) { ul.innerHTML = emptyHtml(`Belum ada pengeluaran di ${monthName(view)}. Tap tombol + untuk mencatat.`); return; }
-    ul.innerHTML = ""; items.forEach(t => ul.appendChild(txItem(t)));
-  }
   const emptyHtml = text => `<li class="empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v12H4z"/><path d="M4 7l2-3h12l2 3M9 12h6"/></svg>${esc(text)}</li>`;
 
-  function txItem(t) {
-    const c = findCat(t.cat) || { id: "x", name: "Kelompok terhapus", color: "--c-x4" };
+  function renderHero() {
+    const b = budgetFor(view), spent = spentBy(), dl = daysLeft(), cur = curYm();
+    const total = sum(Object.values(spent));
+    const past = view < cur, note = $("note");
+    let value, label;
+    if (past) { const s = savedOf(view); value = s; label = s >= 0 ? t("hero.saved") : t("hero.over"); }
+    else { value = b.income - total; label = view > cur ? t("hero.leftFuture") : t("hero.left"); }
+    note.classList.toggle("neg", value < 0);
+    $("hLbl").textContent = label;
+    $("hLeft").innerHTML = `<small>${value < 0 && !past ? "-Rp" : "Rp"}</small>${Math.abs(value).toLocaleString(loc())}`;
+    $("hIncome").textContent = rp(b.income);
+    $("hSpent").textContent = rp(total);
+    $("hMeter").style.width = (b.income ? Math.min(100, total / b.income * 100) : 0) + "%";
+    $("serial").textContent = "AU " + view.replace("-", "") + " · " + monthName(view, { month: "short" }).toUpperCase();
+    $("stamp").hidden = !isLocked(view);
+    $("serial").style.visibility = isLocked(view) ? "hidden" : "";
+    $("editIncome").disabled = !canEditBudget(view);
+
+    const row = $("hDaily");
+    if (!past) {
+      const flex = sum(b.cats.filter(c => c.group !== "tabungan" && c.id !== "tagihan").map(c => Math.max(0, allocOf(c, b) - (spent[c.id] || 0))));
+      const lbl = view === cur ? t("hero.safeToday", { n: dl }) : t("hero.avgDay", { n: dl });
+      row.innerHTML = `<span>${esc(lbl)}</span><b>${rp(dl ? flex / dl : 0)}</b>`;
+      return;
+    }
+    const s = savedOf(view);
+    if (!monthTx().length) row.innerHTML = `<span>${esc(t("hero.noTx"))}</span>`;
+    else if (s <= 0) row.innerHTML = `<span>${esc(t("hero.overNote"))}</span>`;
+    else if (!isLocked(view)) row.innerHTML = `<span>${esc(t("hero.finalAfter", { date: graceEndText(view) }))}</span>`;
+    else {
+      const dep = depositFrom(view);
+      if (dep) row.innerHTML = `<span>${esc(t("hero.inGoal", { name: dep.g.name }))}</span>`;
+      else if (!D.goals.length) row.innerHTML = `<button type="button" data-act="newgoal">${esc(t("hero.makeGoal"))}</button>`;
+      else row.innerHTML = `<button type="button" data-act="togoal">${esc(t("hero.toGoal"))}</button>`;
+    }
+  }
+  $("hDaily").addEventListener("click", e => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (b.dataset.act === "newgoal") openNewGoal();
+    else openPick(view);
+  });
+
+  function renderGrace() {
+    const prev = shiftYm(curYm(), -1);
+    const show = inGrace(prev);
+    $("graceNote").hidden = !show;
+    if (show) $("graceText").textContent = t("grace.note", { month: monthName(prev, { month: "long" }), date: graceEndText(prev) });
+  }
+
+  function renderHome() {
+    renderHero(); renderGrace();
+    const b = budgetFor(view), spent = spentBy(), dl = daysLeft();
+    const tp = Math.max(100, sumPct(b));
+    $("homeStrip").innerHTML = b.cats.filter(c => c.pct).map(c => `<i style="--k:${colorOf(c)};width:${c.pct / tp * 100}%"></i>`).join("");
+    $("homeMini").innerHTML = b.cats.map(c => {
+      const a = allocOf(c, b), s = spent[c.id] || 0;
+      return `<div class="mini${s > a ? " over" : ""}" style="--k:${colorOf(c)}"><span class="ico">${icon(c)}</span><div><span>${esc(catName(c))}</span><b>${rp(a - s)}</b></div></div>`;
+    }).join("");
+
+    renderTrend(); renderGoals(); renderTips(spent, dl);
+
+    const items = [...monthTx()].sort((x, y) => y.date.localeCompare(x.date) || (y.t || 0) - (x.t || 0)).slice(0, 5);
+    const ul = $("recent");
+    if (!items.length) { ul.innerHTML = emptyHtml(t("recent.empty", { month: monthName(view) })); return; }
+    ul.innerHTML = ""; items.forEach(x => ul.appendChild(txItem(x)));
+  }
+
+  function txItem(x, withYear) {
+    const ym = x.date.slice(0, 7);
+    const c = findCat(x.cat, ym) || { id: "x", name: t("tx.deletedCat"), color: "--c-x4" };
     const li = document.createElement("li");
     li.className = "tx";
     li.style.setProperty("--k", colorOf(c));
-    const d = new Date(t.date + "T00:00:00");
-    li.innerHTML = `<span class="ico">${icon(c)}</span><div class="what"><b></b><span></span></div><span class="amt">-${rp(t.amt)}</span>
-      <button type="button" class="x" aria-label="Hapus"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
-    li.querySelector("b").textContent = t.note || c.name;
-    li.querySelector(".what span").textContent = (t.note ? c.name + " · " : "") + d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
-    armable(li.querySelector(".x"), "Hapus", () => {
-      const ym = t.date.slice(0, 7);
-      D.tx[ym] = (D.tx[ym] || []).filter(x => x !== t);
-      save(); renderAll(); toast("Catatan dihapus");
-    });
+    const d = new Date(x.date + "T00:00:00");
+    const locked = isLocked(ym);
+    li.innerHTML = `<span class="ico">${icon(c)}</span><div class="what"><b></b><span></span></div><span class="amt">-${rp(x.amt)}</span>` +
+      (locked ? `<span class="lock" title="${esc(t("tx.locked"))}" aria-label="${esc(t("tx.locked"))}">${LOCK_SVG}</span>`
+              : `<button type="button" class="x" aria-label="${esc(t("del"))}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`);
+    li.querySelector("b").textContent = x.note || catName(c);
+    li.querySelector(".what span").textContent = (x.note ? catName(c) + " · " : "") + d.toLocaleDateString(loc(), withYear ? { day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" });
+    if (!locked) armable(li.querySelector(".x"), t("del"), () => deleteTx(x));
     return li;
   }
 
+  // ---- trend chart + month comparison ----
+  function trendMonths() {
+    const cur = curYm();
+    let end = view > cur ? view : cur;
+    if (view < shiftYm(end, -5)) end = view;
+    return [5, 4, 3, 2, 1, 0].map(k => shiftYm(end, -k));
+  }
+  function renderTrend() {
+    const months = trendMonths();
+    const created = D.meta.created ? ymOf(new Date(D.meta.created)) : curYm();
+    const data = months.map(ym => {
+      const has = monthTx(ym).length > 0;
+      const showIncome = has || ym >= created;
+      return { ym, spent: sum(monthTx(ym).map(x => x.amt)), income: showIncome ? budgetFor(ym).income : 0 };
+    });
+    const W = 320, H = 150, top = 18, bottom = 26, slot = (W - 8) / 6;
+    const max = Math.max(1, ...data.map(d => Math.max(d.spent, d.income))) * 1.08;
+    const y = v => top + (H - top - bottom) * (1 - v / max);
+    let out = "";
+    data.forEach((d, i) => {
+      const x0 = 4 + i * slot, cx = x0 + slot / 2, bw = slot * 0.46, on = d.ym === view;
+      const by = y(d.spent), bh = Math.max(d.spent ? 3 : 0, H - bottom - by);
+      out += `<g data-ym="${d.ym}"><rect x="${x0}" y="0" width="${slot}" height="${H}" fill="transparent"/>`;
+      out += `<rect x="${cx - bw / 2}" y="${H - bottom - bh}" width="${bw}" height="${bh}" rx="5" fill="${on ? "var(--accent)" : "var(--muted)"}" fill-opacity="${on ? 1 : .3}"/>`;
+      if (d.income) out += `<line x1="${x0 + 6}" x2="${x0 + slot - 6}" y1="${y(d.income)}" y2="${y(d.income)}" stroke="var(--ink)" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+      if (on && d.spent) out += `<text x="${cx}" y="${Math.max(11, H - bottom - bh - 6)}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)">${esc(rpShort(d.spent))}</text>`;
+      out += `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="10" font-weight="${on ? 800 : 600}" fill="${on ? "var(--ink)" : "var(--muted)"}">${esc(monthName(d.ym, { month: "short" }))}</text></g>`;
+    });
+    out += `<line x1="4" x2="${W - 4}" y1="${H - bottom}" y2="${H - bottom}" stroke="var(--line)"/>`;
+    const svg = $("trendSvg");
+    svg.innerHTML = out;
+    svg.setAttribute("aria-label", t("sec.trend") + ": " + data.map(d => `${monthShort(d.ym)} ${rp(d.spent)}`).join(", "));
+
+    const prev = shiftYm(view, -1), maxDay = view === curYm() ? now().getDate() : 0;
+    const a = windowSum(view, maxDay), bsum = windowSum(prev, maxDay);
+    const line = $("cmpLine");
+    if (!bsum) { line.innerHTML = `<span style="color:var(--muted)">${esc(t("cmp.none"))}</span>`; return; }
+    const p = Math.round((a - bsum) / bsum * 100);
+    const cls = p > 0 ? "up" : p < 0 ? "down" : "same";
+    const delta = p > 0 ? t("cmp.up", { p }) : p < 0 ? t("cmp.down", { p: -p }) : t("cmp.same");
+    const range = maxDay ? t("cmp.range", { d: maxDay }) : "";
+    line.innerHTML = `<span class="delta ${cls}">${esc(delta)}</span><span>${esc(t("cmp.line", { delta: "", prev: monthName(prev, { month: "long" }), range }).trim())}</span><span style="color:var(--muted);margin-left:auto" class="num">${esc(t("cmp.vs", { a: rpShort(a), b: rpShort(bsum) }))}</span>`;
+  }
+  $("trendSvg").addEventListener("click", e => { const g = e.target.closest("[data-ym]"); if (g && g.dataset.ym !== view) { view = g.dataset.ym; renderAll(); } });
+
+  // ---- goals ----
+  function renderGoals() {
+    const card = $("goalCard"), ts = totalSaved();
+    let html = "";
+    if (ts.first) html += `<div class="saved-total"><span>${esc(t("goal.savedTotal", { month: monthShort(ts.first) }))}</span><b>${rp(ts.amt)}</b></div>`;
+    if (!D.goals.length) {
+      card.innerHTML = html + `<div class="empty" style="padding:12px 4px"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">${ICONS.goal}</svg>${esc(t("goal.empty"))}<div style="margin-top:12px"><button class="btn" type="button" id="goalEmptyBtn">${esc(t("goal.create"))}</button></div></div>`;
+      $("goalEmptyBtn").onclick = openNewGoal;
+      return;
+    }
+    const share = savingsShare();
+    html += D.goals.map(g => {
+      const s = goalSaved(g), pct = g.target ? Math.min(100, s / g.target * 100) : 0;
+      let sub;
+      if (s >= g.target) sub = t("goal.done");
+      else if (share > 0) sub = t("goal.eta", { month: monthShort(shiftYm(curYm(), Math.ceil((g.target - s) / share))), amt: rpShort(share) });
+      else sub = t("goal.noEta");
+      return `<button type="button" class="goal" data-g="${esc(g.id)}"><div class="goal-top"><b></b><span>${Math.floor(pct)}%</span></div><div class="bar"><i style="width:${pct}%"></i></div><small>${esc(t("goal.progress", { saved: rp(s), target: rp(g.target) }))} · ${esc(sub)}</small></button>`;
+    }).join("");
+    card.innerHTML = html;
+    card.querySelectorAll("[data-g]").forEach(btn => { btn.querySelector("b").textContent = D.goals.find(g => g.id === btn.dataset.g).name; });
+  }
+  $("goalCard").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (b) openGoal(b.dataset.g); });
+  $("newGoalLink").addEventListener("click", () => openNewGoal());
+
+  function openNewGoal() {
+    $("goalName").value = ""; $("goalAmt").value = ""; $("goalErr").textContent = "";
+    sheet("sh-goal"); setTimeout(() => $("goalName").focus(), 320);
+  }
+  $("goalAmt").addEventListener("input", e => { e.target.value = grouped(digits(e.target.value)); });
+  $("goalForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = $("goalName").value.trim(), target = digits($("goalAmt").value);
+    if (!name) { $("goalErr").textContent = t("err.goalName"); $("goalName").focus(); return; }
+    if (!target) { $("goalErr").textContent = t("err.goalAmt"); $("goalAmt").focus(); return; }
+    D.goals.push({ id: "g" + uid(), name, target, deposits: [] });
+    save(); closeSheet(); renderAll(); toast(t("toast.goalSaved", { name }));
+  });
+
+  let curGoal = null;
+  function openGoal(id) {
+    curGoal = id;
+    $("depAmt").value = ""; $("depErr").textContent = "";
+    renderGoalDetail();
+    sheet("sh-goal-detail");
+  }
+  function renderGoalDetail() {
+    const g = D.goals.find(x => x.id === curGoal); if (!g) return;
+    const s = goalSaved(g), pct = g.target ? Math.min(100, s / g.target * 100) : 0;
+    $("gdTitle").textContent = g.name;
+    $("gdBig").innerHTML = `<b>${rp(s)}</b><div class="bar"><i style="width:${pct}%"></i></div><small>${esc(t("goal.progress", { saved: Math.floor(pct) + "%", target: rp(g.target) }))}</small>`;
+    const share = savingsShare();
+    $("depQuick").innerHTML = share ? `<button type="button" data-v="${share}">${esc(t("goal.quick", { amt: rpShort(share) }))}</button>` : "";
+    const ul = $("gdList");
+    const deps = [...g.deposits].sort((a, b) => b.date.localeCompare(a.date));
+    if (!deps.length) { ul.innerHTML = emptyHtml(t("goal.noDeposits")); return; }
+    ul.innerHTML = "";
+    deps.forEach(d => {
+      const li = document.createElement("li");
+      li.className = "tx"; li.style.setProperty("--k", "var(--c-tabungan)");
+      li.innerHTML = `<span class="ico">${svgI(ICONS.tabungan)}</span><div class="what"><b></b><span></span></div><span class="amt" style="color:var(--accent)">+${rp(d.amt)}</span><button type="button" class="x" aria-label="${esc(t("del"))}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+      li.querySelector("b").textContent = d.fromYm ? t("goal.fromMonth", { month: monthName(d.fromYm) }) : t("goal.manual");
+      li.querySelector(".what span").textContent = new Date(d.date + "T00:00:00").toLocaleDateString(loc(), { day: "numeric", month: "short", year: "numeric" });
+      armable(li.querySelector(".x"), t("del"), () => {
+        g.deposits = g.deposits.filter(x => x !== d);
+        save(); renderGoalDetail(); renderAll(); toast(t("toast.depDeleted"));
+      });
+      ul.appendChild(li);
+    });
+  }
+  $("depAmt").addEventListener("input", e => { e.target.value = grouped(digits(e.target.value)); });
+  $("depQuick").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) $("depAmt").value = grouped(+b.dataset.v); });
+  $("depForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const g = D.goals.find(x => x.id === curGoal); if (!g) return;
+    const amt = digits($("depAmt").value);
+    if (!amt) { $("depErr").textContent = t("err.amt"); $("depAmt").focus(); return; }
+    g.deposits.push({ id: uid(), date: isoOf(now()), amt });
+    $("depAmt").value = ""; $("depErr").textContent = "";
+    save(); renderGoalDetail(); renderAll(); toast(t("toast.deposit", { amt: rp(amt), name: g.name }));
+  });
+  $("gdDelete").addEventListener("click", () => {
+    const g = D.goals.find(x => x.id === curGoal); if (!g) return;
+    confirmSheet(t("cf.goalTitle"), t("cf.goalText", { name: g.name }), t("goal.delete"), () => {
+      D.goals = D.goals.filter(x => x !== g);
+      save(); renderAll(); toast(t("toast.goalDeleted"));
+    });
+  });
+
+  // ---- put a closed month's leftover into a goal ----
+  let pickYm = null;
+  function openPick(ym) {
+    const amt = savedOf(ym);
+    if (!isLocked(ym) || amt <= 0 || depositFrom(ym)) return;
+    pickYm = ym;
+    $("pickText").textContent = t("pick.text", { amt: rp(amt), month: monthName(ym) });
+    $("pickList").innerHTML = D.goals.map(g => `<button type="button" data-g="${esc(g.id)}"><b></b><span>${esc(t("goal.progress", { saved: rpShort(goalSaved(g)), target: rpShort(g.target) }))}</span></button>`).join("");
+    $("pickList").querySelectorAll("[data-g]").forEach(b => { b.querySelector("b").textContent = D.goals.find(g => g.id === b.dataset.g).name; });
+    sheet("sh-pick");
+  }
+  $("pickList").addEventListener("click", e => {
+    const b = e.target.closest("[data-g]"); if (!b || !pickYm) return;
+    const g = D.goals.find(x => x.id === b.dataset.g), amt = savedOf(pickYm);
+    if (!g || depositFrom(pickYm) || amt <= 0) return;
+    g.deposits.push({ id: uid(), date: isoOf(now()), amt, fromYm: pickYm });
+    pickYm = null;
+    save(); closeSheet(); renderAll(); toast(t("toast.deposit", { amt: rp(amt), name: g.name }));
+  });
+
+  // ---- tips ----
   function renderTips(spent, dl) {
-    const st = D.settings, tips = [], total = sumPct();
-    if (!st.income) tips.push(["warn", "Isi total uang bulan ini dengan tap \"Total uang\" di kartu atas."]);
-    if (total !== 100) tips.push(["warn", `Total persentase ${total}%. Atur di tab Anggaran supaya tepat 100%.`]);
-    for (const c of st.cats) {
-      const a = allocOf(c), s = spent[c.id] || 0;
+    const b = budgetFor(view), tips = [], total = sumPct(b);
+    if (!b.income) tips.push(["warn", t("tip.noIncome")]);
+    if (total !== 100) tips.push(["warn", t("tip.pct", { t: total })]);
+    for (const c of b.cats) {
+      const a = allocOf(c, b), s = spent[c.id] || 0;
       if (c.group === "tabungan" || !a) continue;
-      if (s > a) tips.push(["bad", `${c.name} lewat ${rp(s - a)}. Tutup dari jatah keinginan, jangan dari tabungan.`]);
-      else if (s / a >= 0.8 && dl > 0) tips.push(["warn", `${c.name} sudah ${Math.round(s / a * 100)}%. Sisa ${rp(a - s)} untuk ${dl} hari, sekitar ${rp((a - s) / dl)} per hari.`]);
+      if (s > a) tips.push(["bad", t("tip.over", { cat: catName(c), amt: rp(s - a) })]);
+      else if (s / a >= 0.8 && dl > 0) tips.push(["warn", t("tip.near", { cat: catName(c), p: Math.round(s / a * 100), amt: rp(a - s), n: dl, day: rp((a - s) / dl) })]);
     }
-    const mk = findCat("makan");
-    if (mk && st.income && dl > 0) {
-      const left = allocOf(mk) - (spent.makan || 0);
-      if (left > 0) tips.push(["", `Jatah makan sekitar ${rp(left / dl)} per hari, atau ${rp(left / dl / 3)} sekali makan.`]);
+    // biggest category increases vs last month (same day-window for the current month)
+    const prev = shiftYm(view, -1), maxDay = view === curYm() ? now().getDate() : 0;
+    b.cats.filter(c => c.group !== "tabungan").map(c => {
+      const a = windowSum(view, maxDay, c.id), p = windowSum(prev, maxDay, c.id);
+      return { c, a, p, diff: a - p, pct: p ? Math.round((a - p) / p * 100) : 0 };
+    }).filter(r => r.p > 0 && r.diff >= 20000 && r.pct >= 10).sort((x, y) => y.diff - x.diff).slice(0, 2)
+      .forEach(r => tips.push(["warn", t("tip.rise", { cat: catName(r.c), p: r.pct, prev: monthName(prev, { month: "long" }), amt: rp(r.diff) })]));
+
+    const mk = b.cats.find(c => c.id === "makan");
+    if (mk && b.income && dl > 0) {
+      const left = allocOf(mk, b) - (spent.makan || 0);
+      if (left > 0) tips.push(["", t("tip.food", { day: rp(left / dl), meal: rp(left / dl / 3) })]);
     }
-    const tb = findCat("tabungan");
-    if (tb && st.income) tips.push(["", `Pindahkan ${rp(allocOf(tb))} ke rekening tabungan begitu uang masuk. Yang tidak terlihat, tidak terpakai.`]);
-    if (st.income && st.income < 3000000 && st.preset === "seimbang") tips.push(["", "Dengan pemasukan di bawah Rp 3 juta, gaya Pemula biasanya lebih realistis untuk makan dan transport."]);
+    const tb = b.cats.find(c => c.id === "tabungan");
+    if (tb && b.income && view >= curYm()) tips.push(["", t("tip.save", { amt: rp(allocOf(tb, b)) })]);
+    if (b.income && b.income < 3000000 && b.preset === "seimbang") tips.push(["", t("tip.starter")]);
     const hasTx = Object.values(D.tx).some(a => a.length);
-    if (hasTx && Date.now() - (D.meta.lastBackup || 0) > 30 * 864e5) tips.push(["", "Sudah lebih dari 30 hari sejak cadangan terakhir. Buat cadangan di tab Lainnya supaya data aman kalau ganti HP."]);
-    $("tips").innerHTML = tips.slice(0, 5).map(([k, t]) => `<li class="${k}">${esc(t)}</li>`).join("");
+    if (hasTx && Date.now() - (D.meta.lastBackup || 0) > 30 * 864e5) tips.push(["", t("tip.backup")]);
+    $("tips").innerHTML = tips.slice(0, 5).map(([k, s]) => `<li class="${k}">${esc(s)}</li>`).join("");
   }
 
   // ================= render: budget =================
   const rowRefs = {};
   function renderBudget() {
-    const st = D.settings;
-    $("presets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button type="button" role="radio" data-p="${k}" aria-checked="${st.preset === k}">${p.label}</button>`).join("");
-    $("customTag").hidden = !!PRESETS[st.preset];
-    $("presetDesc").textContent = PRESETS[st.preset] ? PRESETS[st.preset].desc : "Persentase kamu atur sendiri. Ketuk salah satu gaya di atas untuk kembali ke rekomendasi.";
+    const b = budgetFor(view), editable = canEditBudget(view);
+    $("budgetNote").hidden = editable;
+    if (!editable) $("budgetNoteText").textContent = isLocked(view)
+      ? t("budget.locked", { month: monthName(view) })
+      : t("budget.pastGrace", { month: monthName(view), date: graceEndText(view) });
+    $("presets").hidden = !editable;
+    $("presets").innerHTML = Object.keys(PRESETS).map(k => `<button type="button" role="radio" data-p="${k}" aria-checked="${b.preset === k}">${t("preset." + k)}</button>`).join("");
+    $("customTag").hidden = !!PRESETS[b.preset];
+    $("presetDesc").textContent = PRESETS[b.preset] ? t("pdesc." + b.preset) : t("budget.customDesc");
+    $("addCatForm").hidden = !editable;
 
     const list = $("catList"); list.innerHTML = "";
     for (const k in rowRefs) delete rowRefs[k];
-    for (const c of st.cats) {
+    for (const c of b.cats) {
       const el = document.createElement("div");
       el.className = "cat"; el.style.setProperty("--k", colorOf(c));
       el.innerHTML = `<span class="ico">${icon(c)}</span>
         <div class="name"><b></b><span></span></div>
         <div class="nom"></div>
         <div class="ctl">
-          <input type="range" min="0" max="60" step="1" aria-label="Persentase ${esc(c.name)}">
-          <span class="pct"><input type="number" inputmode="numeric" min="0" max="100" aria-label="Persen ${esc(c.name)}">%</span>
-          <button type="button" class="del">Hapus</button>
+          <input type="range" min="0" max="60" step="1">
+          <span class="pct"><input type="number" inputmode="numeric" min="0" max="100">%</span>
+          <button type="button" class="del"></button>
         </div>
         <div class="use"><div class="bar"><i></i></div><div class="use-txt"><span class="used"></span><span class="left"></span></div></div>`;
-      el.querySelector(".name b").textContent = c.name;
-      el.querySelector(".name span").textContent = `${GROUPS[c.group] || "Lainnya"}${c.sub ? " · " + c.sub : ""}`;
-      const range = el.querySelector("input[type=range]"), num = el.querySelector(".pct input");
+      el.querySelector(".name b").textContent = catName(c);
+      el.querySelector(".name span").textContent = `${t("group." + (GROUP_KEYS.includes(c.group) ? c.group : "other"))}${catSub(c) ? " · " + catSub(c) : ""}`;
+      const range = el.querySelector("input[type=range]"), num = el.querySelector(".pct input"), del = el.querySelector(".del");
+      range.setAttribute("aria-label", catName(c) + " %"); num.setAttribute("aria-label", catName(c) + " %");
       range.value = c.pct; num.value = c.pct;
-      range.addEventListener("input", () => { c.pct = +range.value; num.value = c.pct; markCustom(); updateBudgetNumbers(); });
-      range.addEventListener("change", () => { save(); renderHome(); });
-      num.addEventListener("input", () => { c.pct = Math.max(0, Math.min(100, Math.round(+num.value || 0))); range.value = Math.min(60, c.pct); markCustom(); updateBudgetNumbers(); });
-      num.addEventListener("change", () => { num.value = c.pct; save(); renderHome(); });
-      armable(el.querySelector(".del"), "Yakin?", () => {
-        D.settings.cats = D.settings.cats.filter(x => x !== c);
-        markCustom(); save(); renderAll(); toast(`${c.name} dihapus`);
-      });
+      del.textContent = t("del");
+      if (!editable) { range.disabled = true; num.disabled = true; del.hidden = true; }
+      else {
+        range.addEventListener("input", () => { c.pct = +range.value; num.value = c.pct; markCustom(); updateBudgetNumbers(); });
+        range.addEventListener("change", () => { save(); renderHome(); });
+        num.addEventListener("input", () => { c.pct = Math.max(0, Math.min(100, Math.round(+num.value || 0))); range.value = Math.min(60, c.pct); markCustom(); updateBudgetNumbers(); });
+        num.addEventListener("change", () => { num.value = c.pct; save(); renderHome(); });
+        armable(del, t("sure"), () => {
+          D.settings.cats = D.settings.cats.filter(x => x !== c);
+          markCustom(); save(); renderAll(); toast(t("toast.catDeleted", { name: catName(c) }));
+        });
+      }
       rowRefs[c.id] = { el, nom: el.querySelector(".nom"), fill: el.querySelector(".bar i"), used: el.querySelector(".used"), left: el.querySelector(".left") };
       list.appendChild(el);
     }
     updateBudgetNumbers();
   }
   function markCustom() {
-    if (PRESETS[D.settings.preset]) { D.settings.preset = "kustom"; $("customTag").hidden = false;
-      $("presets").querySelectorAll("[data-p]").forEach(b => b.setAttribute("aria-checked", "false"));
-      $("presetDesc").textContent = "Persentase kamu atur sendiri. Ketuk salah satu gaya di atas untuk kembali ke rekomendasi."; }
+    if (!canEditBudget(view) || !PRESETS[D.settings.preset]) return;
+    D.settings.preset = "kustom";
+    $("customTag").hidden = false;
+    $("presets").querySelectorAll("[data-p]").forEach(b => b.setAttribute("aria-checked", "false"));
+    $("presetDesc").textContent = t("budget.customDesc");
   }
   function updateBudgetNumbers() {
-    const st = D.settings, spent = spentBy(), dl = daysLeft(), total = sumPct();
-    for (const c of st.cats) {
+    const b = budgetFor(view), spent = spentBy(), dl = daysLeft(), total = sumPct(b), editable = canEditBudget(view);
+    for (const c of b.cats) {
       const r = rowRefs[c.id]; if (!r) continue;
-      const a = allocOf(c), s = spent[c.id] || 0, ratio = a > 0 ? s / a : (s > 0 ? 2 : 0);
+      const a = allocOf(c, b), s = spent[c.id] || 0, ratio = a > 0 ? s / a : (s > 0 ? 2 : 0);
       r.nom.textContent = rp(a);
       r.fill.style.width = Math.min(100, ratio * 100) + "%";
-      r.used.textContent = `Terpakai ${rp(s)}`;
-      r.left.textContent = s > a ? `Lewat ${rp(s - a)}` : c.group === "tabungan" ? `Sisihkan ${rp(a - s)}` : (dl > 0 && a > 0 ? `Sisa ${rp(a - s)} · ${rpShort((a - s) / dl)}/hari` : `Sisa ${rp(a - s)}`);
+      r.used.textContent = t("row.used", { amt: rp(s) });
+      r.left.textContent = s > a ? t("row.over", { amt: rp(s - a) })
+        : c.group === "tabungan" ? t("row.setAside", { amt: rp(a - s) })
+        : (dl > 0 && a > 0 ? `${t("row.left", { amt: rp(a - s) })} · ${t("row.perDay", { amt: rpShort((a - s) / dl) })}` : t("row.left", { amt: rp(a - s) }));
       r.el.dataset.state = s > a ? "over" : ratio >= .8 ? "warn" : "ok";
     }
     const g = { kebutuhan: 0, keinginan: 0, tabungan: 0 };
-    for (const c of st.cats) g[c.group in g ? c.group : "keinginan"] += c.pct || 0;
-    const tgt = PRESETS[st.preset] && PRESETS[st.preset].target, denom = Math.max(100, total);
-    $("splitStrip").innerHTML = Object.keys(g).map(k => `<i style="--k:${GROUP_COLOR[k]};width:${g[k] / denom * 100}%"></i>`).join("");
-    $("splitLegend").innerHTML = Object.keys(g).map((k, i) => `<span style="--k:${GROUP_COLOR[k]}">${GROUPS[k]} <b>${g[k]}%</b>${tgt ? ` / ${tgt[i]}%` : ""}</span>`).join("");
+    for (const c of b.cats) g[GROUP_KEYS.includes(c.group) ? c.group : "keinginan"] += c.pct || 0;
+    const tgt = PRESETS[b.preset] && PRESETS[b.preset].target, denom = Math.max(100, total);
+    $("splitStrip").innerHTML = GROUP_KEYS.map(k => `<i style="--k:${GROUP_COLOR[k]};width:${g[k] / denom * 100}%"></i>`).join("");
+    $("splitLegend").innerHTML = GROUP_KEYS.map((k, i) => `<span style="--k:${GROUP_COLOR[k]}">${esc(t("group." + k))} <b>${g[k]}%</b>${tgt ? ` / ${tgt[i]}%` : ""}</span>`).join("");
     const pill = $("sumPill");
-    if (total === 100) { pill.className = "sum-pill"; pill.innerHTML = `<span>Total 100% · semua uang punya tugas</span>`; }
+    if (total === 100) { pill.className = "sum-pill"; pill.innerHTML = `<span>${esc(t("budget.total100"))}</span>`; }
     else {
       pill.className = "sum-pill off";
-      pill.innerHTML = `<span>Total ${total}% · ${total > 100 ? "kelebihan " + (total - 100) : "sisa " + (100 - total)}%</span><button type="button" id="fixSum">Pas-kan</button>`;
-      $("fixSum").onclick = () => { fixTo100(); save(); renderAll(); };
+      const what = total > 100 ? t("budget.excess", { n: total - 100 }) : t("budget.remain", { n: 100 - total });
+      pill.innerHTML = `<span>${esc(t("budget.totalOff", { t: total, what }))}</span>` + (editable ? `<button type="button" id="fixSum">${esc(t("budget.fix"))}</button>` : "");
+      if (editable) $("fixSum").onclick = () => { fixTo100(); save(); renderAll(); };
     }
   }
   function fixTo100() {
     const cats = D.settings.cats; if (!cats.length) return;
     const target = cats.find(c => c.id === "tabungan") || cats[cats.length - 1];
-    target.pct = Math.max(0, target.pct + 100 - sumPct());
-    let still = 100 - sumPct();
+    target.pct = Math.max(0, target.pct + 100 - sumPct(D.settings));
+    let still = 100 - sumPct(D.settings);
     for (const c of [...cats].sort((a, b) => b.pct - a.pct)) { if (still >= 0) break; const take = Math.min(c.pct, -still); c.pct -= take; still += take; }
     markCustom();
   }
   $("presets").addEventListener("click", e => {
-    const b = e.target.closest("[data-p]"); if (!b) return;
+    const b = e.target.closest("[data-p]"); if (!b || !canEditBudget(view)) return;
     const key = b.dataset.p;
     const custom = D.settings.cats.filter(c => !(c.id in PRESETS[key].p)).map(c => ({ ...c, pct: 0 }));
     D.settings.preset = key; D.settings.cats = defaultCats(key).concat(custom);
-    save(); renderAll(); toast(`Gaya ${PRESETS[key].label} dipakai`);
+    save(); renderAll(); toast(t("toast.preset", { name: t("preset." + key) }));
   });
   $("addCatForm").addEventListener("submit", e => {
     e.preventDefault();
+    if (!canEditBudget(view)) return;
     const name = $("newCat").value.trim(); if (!name) { $("newCat").focus(); return; }
     const used = D.settings.cats.filter(c => c.color).length;
     D.settings.cats.push({ id: "k" + uid(), name, sub: "", group: "keinginan", pct: 0, color: EXTRA_COLORS[used % EXTRA_COLORS.length] });
-    $("newCat").value = ""; markCustom(); save(); renderAll(); toast(`${name} ditambahkan. Atur persennya.`);
+    $("newCat").value = ""; markCustom(); save(); renderAll(); toast(t("toast.catAdded", { name }));
   });
 
-  // ================= render: history =================
-  function renderHistory() {
+  // ================= render: history (search & filter) =================
+  let hq = "", hall = false;
+  const hcats = new Set();
+  function filterCats() {
+    const seen = new Map();
+    for (const c of [...budgetFor(view).cats, ...D.settings.cats]) if (!seen.has(c.id)) seen.set(c.id, c);
+    return [...seen.values()];
+  }
+  function renderHistFilters() {
+    $("hFilters").innerHTML = `<button type="button" class="fchip" data-all aria-pressed="${hall}">${esc(t("hist.allMonths"))}</button>` +
+      filterCats().map(c => `<button type="button" class="fchip" data-c="${esc(c.id)}" aria-pressed="${hcats.has(c.id)}" style="--k:${colorOf(c)}"><i></i>${esc(catName(c))}</button>`).join("");
+  }
+  $("hFilters").addEventListener("click", e => {
+    const b = e.target.closest(".fchip"); if (!b) return;
+    if (b.hasAttribute("data-all")) hall = !hall;
+    else { const id = b.dataset.c; hcats.has(id) ? hcats.delete(id) : hcats.add(id); }
+    renderHistFilters(); renderHistoryList();
+  });
+  $("hSearch").addEventListener("input", e => { hq = e.target.value; renderHistoryList(); });
+
+  function renderHistoryList() {
     const box = $("historyList");
-    const items = [...monthTx()].sort((a, b) => b.date.localeCompare(a.date) || (b.t || 0) - (a.t || 0));
-    if (!items.length) { box.innerHTML = `<div class="card"><ul class="tx-list">${emptyHtml(`Belum ada pengeluaran di ${monthName(view)}.`)}</ul></div>`; return; }
-    const total = items.reduce((a, t) => a + t.amt, 0);
-    box.innerHTML = `<div class="card" style="display:flex;justify-content:space-between;align-items:center"><span><span class="label">Total ${esc(monthName(view))}</span><br><b style="font-size:1.3rem;font-family:var(--f-display)" class="num">${rp(total)}</b></span><span class="badge">${items.length} catatan</span></div>`;
+    const q = hq.trim().toLowerCase(), qd = String(digits(hq) || "");
+    const active = !!(q || hcats.size || hall);
+    const source = hall ? Object.values(D.tx).flat() : monthTx();
+    const items = source.filter(x => {
+      if (hcats.size && !hcats.has(x.cat)) return false;
+      if (!q) return true;
+      const c = findCat(x.cat, x.date.slice(0, 7));
+      return (x.note || "").toLowerCase().includes(q) || (c && catName(c).toLowerCase().includes(q)) || (qd && String(x.amt).includes(qd));
+    }).sort((a, b) => b.date.localeCompare(a.date) || (b.t || 0) - (a.t || 0));
+
+    if (!items.length) {
+      box.innerHTML = `<div class="card"><ul class="tx-list">${emptyHtml(active ? t("hist.noMatch") : t("hist.empty", { month: monthName(view) }))}</ul></div>`;
+      return;
+    }
+    const total = sum(items.map(x => x.amt));
+    box.innerHTML = `<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span><span class="label">${esc(active ? t("hist.results") : t("hist.total", { month: monthName(view) }))}</span><br><b style="font-size:1.3rem;font-family:var(--f-display)" class="num">${rp(total)}</b></span><span class="badge">${esc(t("hist.count", { n: items.length }))}</span></div>`;
     const byDay = {};
-    items.forEach(t => (byDay[t.date] = byDay[t.date] || []).push(t));
+    items.forEach(x => (byDay[x.date] = byDay[x.date] || []).push(x));
     for (const day of Object.keys(byDay)) {
       const wrap = document.createElement("div");
       const d = new Date(day + "T00:00:00");
-      const sum = byDay[day].reduce((a, t) => a + t.amt, 0);
-      wrap.innerHTML = `<div class="day-head"><span>${d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}</span><span class="num">-${rp(sum)}</span></div><div class="card" style="padding:4px 14px"><ul class="tx-list"></ul></div>`;
+      const opt = hall ? { weekday: "short", day: "numeric", month: "long", year: "numeric" } : { weekday: "long", day: "numeric", month: "long" };
+      wrap.innerHTML = `<div class="day-head"><span>${esc(d.toLocaleDateString(loc(), opt))}</span><span class="num">-${rp(sum(byDay[day].map(x => x.amt)))}</span></div><div class="card" style="padding:4px 14px"><ul class="tx-list"></ul></div>`;
       const ul = wrap.querySelector("ul");
-      byDay[day].forEach(t => ul.appendChild(txItem(t)));
+      byDay[day].forEach(x => ul.appendChild(txItem(x, hall)));
       box.appendChild(wrap);
     }
   }
+  function renderHistory() { renderHistFilters(); renderHistoryList(); }
 
   // ================= render: more / storage =================
   function renderStoreInfo() {
     if (!D) return;
     const both = okLS && okIDB && idb;
-    $("storeInfo").textContent = both ? "Tersimpan otomatis di iPhone ini (2 salinan)" : (okLS || okIDB) ? "Tersimpan otomatis di perangkat ini" : "Gagal menyimpan. Buat cadangan sekarang.";
+    $("storeInfo").textContent = both ? t("store.ok2") : (okLS || okIDB) ? t("store.ok1") : t("store.fail");
     const b = $("storeBadge");
-    if (!okLS && !okIDB) { b.textContent = "Bermasalah"; b.className = "badge warn"; }
-    else if (persisted) { b.textContent = "Permanen"; b.className = "badge"; }
-    else { b.textContent = "Aktif"; b.className = "badge"; }
+    if (!okLS && !okIDB) { b.textContent = t("badge.problem"); b.className = "badge warn"; }
+    else { b.textContent = persisted ? t("badge.perm") : t("badge.active"); b.className = "badge"; }
     $("savedAt").textContent = fmtWhen(D._t);
-    $("backupAt").textContent = D.meta.lastBackup ? fmtWhen(D.meta.lastBackup) : "Belum pernah. Disarankan sebulan sekali.";
+    $("backupAt").textContent = D.meta.lastBackup ? fmtWhen(D.meta.lastBackup) : t("more.never");
+    const ts = totalSaved();
+    $("savedSince").textContent = ts.first ? t("more.savedSince", { month: monthShort(ts.first) }) : t("more.savedNone");
+    $("savedTotalMore").textContent = ts.first ? rp(ts.amt) : "";
   }
 
   $("exportBtn").addEventListener("click", async () => {
     saveNow();
-    const name = `atur-uang-cadangan-${isoOf(now())}.json`;
-    const text = JSON.stringify(D, null, 2);
-    const file = new File([text], name, { type: "application/json" });
+    const name = `${t("backup.file")}-${isoOf(now())}.json`;
+    const file = new File([JSON.stringify(D, null, 2)], name, { type: "application/json" });
     let done = false;
     try {
-      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: "Cadangan Atur Uang" }); done = true; }
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: t("backup.title") }); done = true; }
     } catch (e) { if (e && e.name === "AbortError") return; }
     if (!done) {
       const url = URL.createObjectURL(file);
@@ -987,26 +1677,29 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
       setTimeout(() => URL.revokeObjectURL(url), 4000);
     }
     D.meta.lastBackup = Date.now(); saveNow(); renderStoreInfo(); renderHome();
-    toast("Cadangan dibuat");
+    toast(t("toast.backup"));
   });
   $("importBtn").addEventListener("click", () => $("importFile").click());
   $("importFile").addEventListener("change", async e => {
     const f = e.target.files && e.target.files[0]; e.target.value = "";
     if (!f) return;
     let data;
-    try { data = JSON.parse(await f.text()); } catch { toast("File itu bukan cadangan Atur Uang."); return; }
-    if (!valid(data)) { toast("File itu bukan cadangan Atur Uang."); return; }
+    try { data = JSON.parse(await f.text()); } catch { toast(t("toast.badFile")); return; }
+    if (!valid(data)) { toast(t("toast.badFile")); return; }
     const n = Object.values(data.tx).reduce((a, x) => a + (Array.isArray(x) ? x.length : 0), 0);
-    confirmSheet("Pulihkan cadangan?", `Data sekarang akan diganti dengan cadangan tanggal ${fmtWhen(data._t)} (${n} catatan pengeluaran).`, "Ganti dengan cadangan", () => {
-      data.meta = data.meta || { created: Date.now(), lastBackup: 0 };
-      D = data; saveNow(); renderAll(); toast("Data dipulihkan");
+    confirmSheet(t("cf.restoreTitle"), t("cf.restoreText", { date: fmtWhen(data._t), n }), t("cf.restoreOk"), () => {
+      D = migrate(data); lang = D.lang;
+      ensureSnapshots(); saveNow();
+      applyStatic(); renderLangSegs(); greet(); go(tab); renderAll();
+      toast(t("toast.restored"));
     });
   });
   $("resetBtn").addEventListener("click", () => {
-    confirmSheet("Hapus semua data?", "Semua pengaturan dan catatan pengeluaran di HP ini akan dihapus. Buat cadangan dulu kalau masih butuh.", "Hapus semua", () => {
+    confirmSheet(t("cf.resetTitle"), t("cf.resetText"), t("cf.resetOk"), () => {
       D = null; dirty = false; clearTimeout(saveTimer);
       try { localStorage.removeItem(LS_KEY); } catch {}
-      idbReady.then(db => { try { db && db.transaction("kv", "readwrite").objectStore("kv").delete("data"); } catch {} });
+      idbReady.then(db => { try { if (db) db.transaction("kv", "readwrite").objectStore("kv").delete("data"); } catch {} });
+      view = curYm(); tab = "home";
       $("app").hidden = true; $("onboard").hidden = false; $("obIncome").value = ""; renderOnboard();
     });
   });
@@ -1023,10 +1716,10 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
   // ================= boot =================
   function greet() {
     const h = now().getHours();
-    $("greet").textContent = h < 11 ? "Selamat pagi" : h < 15 ? "Selamat siang" : h < 18 ? "Selamat sore" : "Selamat malam";
+    $("greet").textContent = t(h < 11 ? "greet.morning" : h < 15 ? "greet.noon" : h < 18 ? "greet.afternoon" : "greet.night");
   }
   function renderAll() {
-    $("monthLabel").textContent = monthName(view, { month: "short", year: "numeric" });
+    $("monthLabel").innerHTML = (isLocked(view) ? LOCK_SVG : "") + esc(monthName(view, { month: "short", year: "numeric" }));
     renderHome(); renderBudget(); renderHistory(); renderStoreInfo();
   }
   function showApp() {
@@ -1035,15 +1728,24 @@ h1, h2, h3 { font-family: var(--f-display); margin: 0; letter-spacing: -0.015em;
   }
 
   drawGuilloche();
+  applyStatic(); renderLangSegs();
   load().then(d => {
-    if (d) { D = d; D.meta = D.meta || { created: Date.now(), lastBackup: 0 }; showApp();
+    if (d) {
+      const wasV1 = !d.v || d.v < 2;
+      D = migrate(d);
+      lang = D.lang;
+      applyStatic(); renderLangSegs();
+      if (ensureSnapshots() || wasV1) saveNow();
+      showApp();
       if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then(p => { persisted = p; renderStoreInfo(); }).catch(() => {});
       askPersist();
     } else { $("onboard").hidden = false; renderOnboard(); }
   });
 
-  // refresh "today" numbers when the app comes back from background on a new day
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && D) { greet(); renderAll(); } });
+  // When the app comes back from the background (maybe on a new day or month), refresh.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && D) { ensureSnapshots(); greet(); renderAll(); }
+  });
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
     navigator.serviceWorker.register("sw.js").catch(() => {});

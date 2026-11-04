@@ -1,5 +1,5 @@
 // Offline support. Bump VERSION whenever any app file changes so phones pick up the update.
-const VERSION = "atur-uang-v1";
+const VERSION = "atur-uang-v1.1";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {
